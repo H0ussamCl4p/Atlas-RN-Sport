@@ -103,15 +103,6 @@ export default function Login() {
 
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
-              {/* Demo Account Notice */}
-              <Alert className="border-primary/20 bg-primary/5">
-                <Info className="h-4 w-4 text-primary" />
-                <AlertDescription className="text-sm">
-                  <strong>Compte de démonstration</strong> pour les juges RN Sport 2026.
-                  Les identifiants sont pré-remplis.
-                </AlertDescription>
-              </Alert>
-
               {/* Error Alert */}
               {error && (
                 <Alert variant="destructive">
