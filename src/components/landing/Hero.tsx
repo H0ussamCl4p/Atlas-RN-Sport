@@ -1,195 +1,95 @@
 /**
  * Hero Section Component
  * 
- * Full viewport hero with staggered text animations and premium CTAs.
- * Includes subtle 3D parallax effect on mouse movement and scroll-based parallax.
- * Features animated football pitch lines in the background.
+ * Minimal, editorial hero for professional football analytics platform.
+ * Strong headline, one powerful sentence, background pitch grid.
+ * No decoration - just confident typography and data visualization.
  */
 
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { ArrowRight } from 'lucide-react';
 import { 
-  heroContainerVariants, 
-  heroTextVariants, 
-  heroButtonVariants,
-  badgeVariants,
+  textRevealVariants, 
+  staggerTextVariants,
+  staggerTextChild,
   prefersReducedMotion 
-} from '@/animations/landingVariants';
-import { useParallax } from '@/hooks/useParallax';
-import { PitchLines } from './PitchLines';
-import { responsiveTypography } from '@/styles/typography';
+} from '@/animations/analyticalVariants';
+import { PitchGrid } from './PitchGrid';
 
 export function Hero() {
   const navigate = useNavigate();
-  const [mounted, setMounted] = useState(false);
-
-  // Scroll-based parallax for background
-  const backgroundY = useParallax(30, { range: [0, 0.5] });
-
-  // Mouse position for 3D parallax effect
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  // Smooth spring animation for 3D parallax
-  const springConfig = { damping: 25, stiffness: 150 };
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), springConfig);
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), springConfig);
-
-  useEffect(() => {
-    setMounted(true);
-
-    if (prefersReducedMotion) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5);
-      const y = (e.clientY / innerHeight - 0.5);
-      mouseX.set(x);
-      mouseY.set(y);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      {/* Animated pitch lines background with scroll parallax */}
-      <motion.div 
-        className="absolute inset-0"
-        style={{ y: backgroundY }}
-      >
-        <PitchLines variant="hero" animate={true} />
-      </motion.div>
-
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+      {/* Background pitch grid - low opacity */}
+      <PitchGrid animate={true} showZones={true} />
       
-      {/* Grid pattern background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none opacity-50" />
+      {/* Subtle vignette */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/80 pointer-events-none" />
 
-      <motion.div
-        variants={prefersReducedMotion ? {} : heroContainerVariants}
-        initial="hidden"
-        animate={mounted ? "visible" : "hidden"}
-        className="relative z-10 container mx-auto px-4 py-20 md:py-32"
-        style={{
-          rotateX: prefersReducedMotion ? 0 : rotateX,
-          rotateY: prefersReducedMotion ? 0 : rotateY,
-          transformStyle: "preserve-3d",
-        }}
-      >
-        <div className="max-w-5xl mx-auto text-center space-y-8">
-          {/* Badge */}
-          <motion.div
-            variants={prefersReducedMotion ? {} : badgeVariants}
-            className="flex justify-center"
-          >
-            <Badge 
-              variant="outline" 
-              className="px-4 py-1.5 text-sm font-medium border-primary/20 bg-primary/5"
-            >
-              Propulsé par l'IA
-            </Badge>
-          </motion.div>
-
-          {/* Main Headline */}
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-4 py-32 md:py-40">
+        <motion.div
+          variants={!prefersReducedMotion ? staggerTextVariants : undefined}
+          initial="hidden"
+          animate="visible"
+          className="max-w-6xl mx-auto"
+        >
+          {/* Main Headline - editorial, strong */}
           <motion.h1
-            variants={prefersReducedMotion ? {} : heroTextVariants}
-            className={responsiveTypography.hero}
+            variants={!prefersReducedMotion ? staggerTextChild : undefined}
+            className="font-display text-5xl md:text-7xl lg:text-8xl text-foreground mb-8 tracking-tight leading-[0.95]"
           >
-            Atlas
+            L'intelligence tactique
+            <br />
+            du football,{' '}
+            <span className="text-primary">réinventée</span>
           </motion.h1>
 
-          {/* Sub-headline */}
+          {/* One powerful sentence */}
           <motion.p
-            variants={prefersReducedMotion ? {} : heroTextVariants}
-            className={`${responsiveTypography.title} text-muted-foreground leading-tight`}
+            variants={!prefersReducedMotion ? staggerTextChild : undefined}
+            className="text-xl md:text-2xl lg:text-3xl text-muted-foreground max-w-4xl leading-relaxed mb-12"
           >
-            L'intelligence tactique du football,
-            <br />
-            <span className="text-foreground">réinventée par l'IA</span>
+            Atlas transforme vos matchs en données exploitables.
+            <br className="hidden md:block" />
+            Analyse automatisée. Insights professionnels. Décisions éclairées.
           </motion.p>
 
-          {/* Supporting text */}
-          <motion.p
-            variants={prefersReducedMotion ? {} : heroTextVariants}
-            className={`${responsiveTypography.body} text-muted-foreground max-w-3xl mx-auto leading-relaxed`}
-          >
-            Transformez vos matchs en décisions tactiques exploitables. 
-            Analyse vidéo automatisée, heatmaps en temps réel, et insights de niveau professionnel.
-          </motion.p>
-
-          {/* CTAs */}
+          {/* Single, clear CTA */}
           <motion.div
-            variants={prefersReducedMotion ? {} : heroTextVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
+            variants={!prefersReducedMotion ? staggerTextChild : undefined}
           >
-            <motion.div
-              variants={prefersReducedMotion ? {} : heroButtonVariants}
-              whileHover={prefersReducedMotion ? {} : "hover"}
-              whileTap={prefersReducedMotion ? {} : "tap"}
+            <button
+              onClick={() => navigate('/register')}
+              className="group inline-flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground font-medium text-lg rounded-sm hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
             >
-              <Button
-                size="lg"
-                className="text-base md:text-lg px-6 md:px-8 py-5 md:py-6 font-semibold min-h-[44px] touch-manipulation"
-                onClick={() => navigate('/register')}
-              >
-                Commencer l'analyse
-              </Button>
-            </motion.div>
-
-            <motion.div
-              variants={prefersReducedMotion ? {} : heroButtonVariants}
-              whileHover={prefersReducedMotion ? {} : "hover"}
-              whileTap={prefersReducedMotion ? {} : "tap"}
-            >
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-base md:text-lg px-6 md:px-8 py-5 md:py-6 font-semibold min-h-[44px] touch-manipulation"
-                onClick={() => navigate('/login')}
-              >
-                Voir la démo
-              </Button>
-            </motion.div>
+              Découvrir Atlas
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
           </motion.div>
 
-          {/* Social proof / stats */}
+          {/* Minimal stats - data emphasis */}
           <motion.div
-            variants={prefersReducedMotion ? {} : heroTextVariants}
-            className="flex flex-wrap justify-center gap-8 pt-8 text-sm text-muted-foreground"
+            variants={!prefersReducedMotion ? staggerTextChild : undefined}
+            className="flex gap-12 mt-20 text-sm text-muted-foreground"
           >
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold text-foreground">10K+</span>
-              <span>Matchs analysés</span>
+            <div>
+              <div className="text-3xl font-bold text-foreground tabular-nums mb-1">10K+</div>
+              <div className="uppercase tracking-wider">Matchs analysés</div>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold text-foreground">500+</span>
-              <span>Clubs utilisateurs</span>
+            <div>
+              <div className="text-3xl font-bold text-foreground tabular-nums mb-1">500+</div>
+              <div className="uppercase tracking-wider">Clubs</div>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold text-foreground">98%</span>
-              <span>Précision IA</span>
+            <div>
+              <div className="text-3xl font-bold text-foreground tabular-nums mb-1">98%</div>
+              <div className="uppercase tracking-wider">Précision</div>
             </div>
           </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.5, duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2">
-          <div className="w-1.5 h-3 bg-muted-foreground/50 rounded-full animate-pulse" />
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 }

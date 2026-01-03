@@ -1,6 +1,9 @@
-import { Play, Clock, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+/**
+ * RecentAnalysis - iOS-inspired list of recent video analyses
+ */
+
+import { Play, Clock, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Analysis {
   id: string;
@@ -8,7 +11,6 @@ interface Analysis {
   date: string;
   duration: string;
   formation: string;
-  thumbnail?: string;
 }
 
 const mockAnalyses: Analysis[] = [
@@ -33,46 +35,50 @@ const mockAnalyses: Analysis[] = [
     duration: "0:45",
     formation: "3-5-2",
   },
+  {
+    id: "4",
+    title: "Séance tactique - Transition défensive",
+    date: "Il y a 5 jours",
+    duration: "3:20",
+    formation: "4-2-3-1",
+  },
 ];
 
 export function RecentAnalysis() {
   return (
-    <div className="glass-card p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-heading font-semibold text-lg text-foreground">
+    <div>
+      {/* Section Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-medium text-foreground">
           Analyses récentes
         </h2>
-        <Button variant="ghost" size="sm" className="text-primary">
+        <Link
+          to="/analyses"
+          className="text-sm text-primary hover:text-primary/80 transition-colors font-medium inline-flex items-center gap-1 group"
+        >
           Voir tout
-        </Button>
+          <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
       </div>
 
-      <div className="space-y-4">
+      {/* iOS-style List */}
+      <div className="bg-card/30 backdrop-blur-sm border border-border/50 rounded-xl overflow-hidden">
         {mockAnalyses.map((analysis, index) => (
-          <div
+          <Link
             key={analysis.id}
-            className={cn(
-              "group flex items-center gap-4 p-4 rounded-xl bg-secondary/50 border border-transparent hover:border-primary/30 hover:bg-secondary transition-all duration-300 cursor-pointer",
-              "animate-fade-in"
-            )}
-            style={{ animationDelay: `${index * 100}ms` }}
+            to={`/analysis/${analysis.id}`}
+            className={`flex items-center gap-4 p-4 hover:bg-accent/50 transition-colors group ${
+              index !== mockAnalyses.length - 1 ? "border-b border-border/30" : ""
+            }`}
           >
-            {/* Thumbnail */}
-            <div className="relative w-24 h-16 rounded-lg bg-muted overflow-hidden shrink-0">
-              <div className="absolute inset-0 field-gradient opacity-50" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                  <Play className="w-4 h-4 ml-0.5" />
-                </div>
-              </div>
-              <span className="absolute bottom-1 right-1 text-[10px] font-medium bg-background/80 px-1.5 py-0.5 rounded">
-                {analysis.duration}
-              </span>
+            {/* Play Icon */}
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+              <Play className="w-4 h-4 text-primary" />
             </div>
 
-            {/* Info */}
+            {/* Content */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-sm text-foreground truncate mb-1">
+              <h3 className="text-sm font-medium text-foreground truncate mb-1">
                 {analysis.title}
               </h3>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -80,20 +86,16 @@ export function RecentAnalysis() {
                   <Clock className="w-3 h-3" />
                   {analysis.date}
                 </span>
-                <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  {analysis.formation}
-                </span>
+                <span>·</span>
+                <span>{analysis.duration}</span>
+                <span>·</span>
+                <span>{analysis.formation}</span>
               </div>
             </div>
 
-            {/* Formation Badge */}
-            <div className="shrink-0">
-              <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-semibold">
-                {analysis.formation}
-              </span>
-            </div>
-          </div>
+            {/* Chevron */}
+            <ChevronRight className="w-5 h-5 text-muted-foreground/50 group-hover:text-foreground transition-colors shrink-0" />
+          </Link>
         ))}
       </div>
     </div>

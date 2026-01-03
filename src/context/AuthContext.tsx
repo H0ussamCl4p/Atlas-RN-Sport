@@ -120,7 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await refreshUser();
 
         // Redirect to dashboard
-        navigate("/");
+        navigate("/dashboard");
       } catch (error) {
         console.error("Login failed:", error);
         throw error;
@@ -146,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         await refreshUser();
 
         // Redirect to dashboard
-        navigate("/");
+        navigate("/dashboard");
       } catch (error) {
         console.error("Registration failed:", error);
         throw error;

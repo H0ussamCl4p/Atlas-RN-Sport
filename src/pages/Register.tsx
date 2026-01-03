@@ -1,26 +1,21 @@
 /**
  * Register Page
  * 
- * Professional registration interface with:
- * - Email/password/confirm password form
- * - Client-side validation
- * - Loading states
- * - Error handling
- * - Auto-login after successful registration
- * - Redirect to dashboard if already authenticated
- * 
- * Design matches existing Atlas dark/light theme
+ * Editorial, minimal registration interface.
+ * Continuation of landing page aesthetic.
+ * Typography-first, calm, analytical.
  */
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Shield } from "lucide-react";
+import { prefersReducedMotion } from "@/animations/analyticalVariants";
 
 export default function Register() {
   const { isAuthenticated, isLoading: authLoading, register } = useAuth();
@@ -41,7 +36,7 @@ export default function Register() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !authLoading) {
-      navigate("/", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, authLoading, navigate]);
 
@@ -94,14 +89,10 @@ export default function Register() {
     return true;
   };
 
-  /**
-   * Handle form submission
-   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validate all fields
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
     const isConfirmPasswordValid = validateConfirmPassword(password, confirmPassword);
@@ -113,23 +104,13 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      // Call register from AuthContext - this automatically logs in the user
-      await register({
-        email,
-        password,
-      });
-      
-      // Navigation to dashboard is handled by AuthContext
-      // No need for manual redirect or success state
+      await register({ email, password });
     } catch (err: any) {
       console.error("Registration error:", err);
-
-      // Extract error message
       let errorMessage = "Échec de l'inscription. Veuillez réessayer.";
-
+      
       if (err.response?.data?.detail) {
         const detail = err.response.data.detail;
-        // Handle specific error cases
         if (typeof detail === "string") {
           if (detail.includes("already registered") || detail.includes("already exists")) {
             errorMessage = "Cet email est déjà utilisé. Veuillez vous connecter.";
@@ -146,166 +127,179 @@ export default function Register() {
     }
   };
 
-  // Show loading while checking auth status
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <div className="w-full max-w-md">
-        {/* Logo / Branding */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 mb-4">
-            <Shield className="w-8 h-8 text-primary" />
-          </div>
-          <h1 className="font-heading font-bold text-3xl text-foreground mb-2">
-            Atlas
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <motion.div
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        className="w-full max-w-md"
+      >
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+        >
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-12 group"
+          >
+            <ArrowRight className="w-4 h-4 rotate-180 transition-transform group-hover:-translate-x-1" />
+            Retour à l'accueil
+          </Link>
+        </motion.div>
+
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="mb-12"
+        >
+          <h1 className="text-4xl md:text-5xl font-light tracking-tight text-foreground mb-4">
+            Créer un compte
           </h1>
-          <p className="text-muted-foreground">
-            L'intelligence tactique du football
+          <p className="text-lg text-muted-foreground">
+            Rejoignez la plateforme d'analyse tactique
           </p>
-        </div>
+        </motion.div>
 
-        {/* Register Card */}
-        <Card className="border-border/50 shadow-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl">Créer un compte</CardTitle>
-            <CardDescription>
-              Rejoignez Atlas — l'intelligence tactique du football
-            </CardDescription>
-          </CardHeader>
+        {error && (
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Alert variant="destructive" className="mb-6 border-destructive/50">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
 
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              {/* Error Alert */}
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+        <motion.form
+          onSubmit={handleSubmit}
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="space-y-6"
+        >
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-foreground">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="nom@exemple.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError(null);
+              }}
+              disabled={isSubmitting}
+              className={`h-12 bg-background border-border/50 focus:border-primary transition-colors ${
+                emailError ? "border-destructive" : ""
+              }`}
+              required
+            />
+            {emailError && (
+              <p className="text-sm text-destructive">{emailError}</p>
+            )}
+          </div>
 
-              {/* Email Field */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (emailError) validateEmail(e.target.value);
-                  }}
-                  onBlur={() => validateEmail(email)}
-                  disabled={isSubmitting}
-                  required
-                  className="h-11"
-                />
-                {emailError && (
-                  <p className="text-sm text-destructive">{emailError}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              Mot de passe
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (passwordError) setPasswordError(null);
+                if (confirmPasswordError) setConfirmPasswordError(null);
+              }}
+              disabled={isSubmitting}
+              className={`h-12 bg-background border-border/50 focus:border-primary transition-colors ${
+                passwordError ? "border-destructive" : ""
+              }`}
+              required
+            />
+            {passwordError && (
+              <p className="text-sm text-destructive">{passwordError}</p>
+            )}
+          </div>
 
-              {/* Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Minimum 8 caractères"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (passwordError) validatePassword(e.target.value);
-                    if (confirmPassword && confirmPasswordError) {
-                      validateConfirmPassword(e.target.value, confirmPassword);
-                    }
-                  }}
-                  onBlur={() => validatePassword(password)}
-                  disabled={isSubmitting}
-                  required
-                  className="h-11"
-                />
-                {passwordError && (
-                  <p className="text-sm text-destructive">{passwordError}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+              Confirmer le mot de passe
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (confirmPasswordError) setConfirmPasswordError(null);
+              }}
+              disabled={isSubmitting}
+              className={`h-12 bg-background border-border/50 focus:border-primary transition-colors ${
+                confirmPasswordError ? "border-destructive" : ""
+              }`}
+              required
+            />
+            {confirmPasswordError && (
+              <p className="text-sm text-destructive">{confirmPasswordError}</p>
+            )}
+          </div>
 
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Saisissez à nouveau votre mot de passe"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    if (confirmPasswordError) {
-                      validateConfirmPassword(password, e.target.value);
-                    }
-                  }}
-                  onBlur={() => validateConfirmPassword(password, confirmPassword)}
-                  disabled={isSubmitting}
-                  required
-                  className="h-11"
-                />
-                {confirmPasswordError && (
-                  <p className="text-sm text-destructive">{confirmPasswordError}</p>
-                )}
-              </div>
-            </CardContent>
+          <Button
+            type="submit"
+            className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium group"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className="flex items-center gap-2">
+                <span className="w-1 h-1 rounded-full bg-primary-foreground animate-pulse" />
+                Inscription...
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                Créer mon compte
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            )}
+          </Button>
+        </motion.form>
 
-            <CardFooter className="flex flex-col space-y-4">
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="glow"
-                size="lg"
-                className="w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Inscription en cours...
-                  </>
-                ) : (
-                  "Créer mon compte"
-                )}
-              </Button>
-
-              {/* Link to Login */}
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Déjà un compte ?{" "}
-                  <Link
-                    to="/login"
-                    className="font-medium text-primary hover:text-primary/80 transition-colors"
-                  >
-                    Se connecter
-                  </Link>
-                </p>
-              </div>
-
-              {/* Additional Info */}
-              <p className="text-center text-sm text-muted-foreground">
-                Hackathon RN Sport 2026 • Atlas Football Analytics
-              </p>
-            </CardFooter>
-          </form>
-        </Card>
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>© 2026 Atlas. Tous droits réservés.</p>
-        </div>
-      </div>
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-8 pt-8 border-t border-border/50 text-center"
+        >
+          <p className="text-sm text-muted-foreground">
+            Déjà un compte ?{" "}
+            <Link
+              to="/login"
+              className="text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Se connecter
+            </Link>
+          </p>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
