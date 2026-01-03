@@ -1,6 +1,10 @@
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   User, 
   Bell, 
@@ -12,179 +16,206 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const settingsSections = [
-  {
-    id: "profile",
-    title: "Profil",
-    icon: User,
-    items: [
-      { label: "Nom d'équipe", value: "FC Example", type: "text" },
-      { label: "Email", value: "coach@example.com", type: "text" },
-      { label: "Langue", value: "Français", type: "select" },
-    ],
-  },
-  {
-    id: "notifications",
-    title: "Notifications",
-    icon: Bell,
-    items: [
-      { label: "Notifications par email", value: true, type: "toggle" },
-      { label: "Alertes d'analyse terminée", value: true, type: "toggle" },
-      { label: "Résumé hebdomadaire", value: false, type: "toggle" },
-    ],
-  },
-  {
-    id: "appearance",
-    title: "Apparence",
-    icon: Palette,
-    items: [
-      { label: "Thème sombre", value: true, type: "toggle" },
-      { label: "Animations", value: true, type: "toggle" },
-      { label: "Mode compact", value: false, type: "toggle" },
-    ],
-  },
-  {
-    id: "privacy",
-    title: "Confidentialité",
-    icon: Shield,
-    items: [
-      { label: "Partage de données analytiques", value: false, type: "toggle" },
-      { label: "Vidéos privées par défaut", value: true, type: "toggle" },
-    ],
-  },
-];
-
 export default function Settings() {
+  const { user } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
   return (
     <MainLayout>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="space-y-8">
+        {/* Header */}
         <div>
-          <h1 className="font-heading font-bold text-3xl text-foreground mb-1">
+          <h1 className="font-heading font-bold text-4xl text-foreground mb-2">
             Paramètres
           </h1>
-          <p className="text-muted-foreground">
-            Gérez vos préférences et votre compte
+          <p className="text-muted-foreground text-lg">
+            Gérez vos préférences et informations de compte
           </p>
         </div>
-        <Button variant="glow">
-          <Save className="w-4 h-4 mr-2" />
-          Sauvegarder
-        </Button>
-      </div>
 
-      {/* Settings Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Settings */}
-        <div className="lg:col-span-2 space-y-6">
-          {settingsSections.map((section) => (
-            <div key={section.id} className="glass-card p-6">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <section.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h2 className="font-heading font-semibold text-lg text-foreground">
-                  {section.title}
-                </h2>
+        {/* Profile Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Informations du profil
+            </CardTitle>
+            <CardDescription>
+              Vos informations personnelles et votre rôle
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* First Name */}
+              <div className="space-y-2">
+                <Label htmlFor="firstName">Prénom</Label>
+                <Input
+                  id="firstName"
+                  value={user.first_name || ""}
+                  disabled
+                  className="bg-muted"
+                />
               </div>
 
-              <div className="space-y-4">
-                {section.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between py-3 border-b border-border last:border-0"
-                  >
-                    <span className="text-sm text-foreground">{item.label}</span>
-                    
-                    {item.type === "toggle" && (
-                      <Switch defaultChecked={item.value as boolean} />
-                    )}
-                    
-                    {item.type === "text" && (
-                      <span className="text-sm text-muted-foreground">
-                        {item.value as string}
-                      </span>
-                    )}
-                    
-                    {item.type === "select" && (
-                      <button className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                        {item.value as string}
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
+              {/* Last Name */}
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Nom</Label>
+                <Input
+                  id="lastName"
+                  value={user.last_name || ""}
+                  disabled
+                  className="bg-muted"
+                />
               </div>
-            </div>
-          ))}
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Account Info */}
-          <div className="glass-card p-6">
-            <h3 className="font-heading font-semibold text-foreground mb-4">
-              Mon compte
-            </h3>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                <User className="w-8 h-8 text-primary" />
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  value={user.email}
+                  disabled
+                  className="bg-muted"
+                />
               </div>
-              <div>
-                <p className="font-medium text-foreground">Coach Principal</p>
-                <p className="text-sm text-muted-foreground">Plan Pro</p>
-              </div>
-            </div>
-            <Button variant="outline" className="w-full">
-              Modifier le profil
-            </Button>
-          </div>
 
-          {/* Storage */}
-          <div className="glass-card p-6">
-            <h3 className="font-heading font-semibold text-foreground mb-4">
-              Stockage
-            </h3>
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Utilisé</span>
-                <span className="text-foreground font-medium">2.4 GB / 10 GB</span>
+              {/* Role */}
+              <div className="space-y-2">
+                <Label htmlFor="role">Rôle</Label>
+                <Input
+                  id="role"
+                  value={user.roles && user.roles.length > 0 ? user.roles[0].charAt(0).toUpperCase() + user.roles[0].slice(1) : "Non défini"}
+                  disabled
+                  className="bg-muted"
+                />
               </div>
-              <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
-                <div
-                  className="h-full bg-primary rounded-full transition-all"
-                  style={{ width: "24%" }}
+
+              {/* Organization */}
+              <div className="space-y-2">
+                <Label htmlFor="organization">Club / Organisation</Label>
+                <Input
+                  id="organization"
+                  value={user.organization || ""}
+                  disabled
+                  className="bg-muted"
+                />
+              </div>
+
+              {/* Level */}
+              <div className="space-y-2">
+                <Label htmlFor="level">Niveau</Label>
+                <Input
+                  id="level"
+                  value={
+                    user.level === "amateur" ? "Amateur" :
+                    user.level === "semi-pro" ? "Semi-professionnel" :
+                    user.level === "pro" ? "Professionnel" :
+                    ""
+                  }
+                  disabled
+                  className="bg-muted"
                 />
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              24 analyses stockées
-            </p>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Help */}
-          <div className="glass-card p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <HelpCircle className="w-5 h-5 text-primary" />
+        {/* Notifications Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="w-5 h-5" />
+              Notifications
+            </CardTitle>
+            <CardDescription>
+              Gérez vos préférences de notifications
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Notifications par email</p>
+                <p className="text-sm text-muted-foreground">Recevez des emails sur l'activité</p>
               </div>
-              <h3 className="font-heading font-semibold text-foreground">
-                Besoin d'aide?
-              </h3>
+              <Switch defaultChecked />
             </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Consultez notre documentation ou contactez le support.
-            </p>
-            <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start">
-                Documentation
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                Contacter le support
-              </Button>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Alertes d'analyse terminée</p>
+                <p className="text-sm text-muted-foreground">Notification quand une analyse est prête</p>
+              </div>
+              <Switch defaultChecked />
             </div>
-          </div>
-        </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Résumé hebdomadaire</p>
+                <p className="text-sm text-muted-foreground">Recevez un résumé chaque semaine</p>
+              </div>
+              <Switch />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Appearance Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="w-5 h-5" />
+              Apparence
+            </CardTitle>
+            <CardDescription>
+              Personnalisez l'interface
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Thème sombre</p>
+                <p className="text-sm text-muted-foreground">Utilisez un thème sombre</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Animations</p>
+                <p className="text-sm text-muted-foreground">Activer les animations d'interface</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Mode compact</p>
+                <p className="text-sm text-muted-foreground">Interface plus compacte</p>
+              </div>
+              <Switch />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Privacy Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Confidentialité
+            </CardTitle>
+            <CardDescription>
+              Gérez vos paramètres de confidentialité
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Partage de données analytiques</p>
+                <p className="text-sm text-muted-foreground">Aidez-nous à améliorer le produit</p>
+              </div>
+              <Switch />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   );

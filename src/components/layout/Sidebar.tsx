@@ -7,10 +7,13 @@ import {
   Settings, 
   ChevronLeft,
   ChevronRight,
-  Zap
+  Zap,
+  LogOut,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { title: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -22,6 +25,7 @@ const navItems = [
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   return (
     <aside
@@ -38,7 +42,7 @@ export function Sidebar() {
               <Zap className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-heading font-bold text-lg text-foreground">
-              TacticAI
+              Atlas
             </span>
           </div>
         )}
@@ -81,8 +85,35 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Collapse Button */}
-      <div className="p-3 border-t border-sidebar-border">
+      {/* User Info & Logout */}
+      <div className="p-3 border-t border-sidebar-border space-y-2">
+        {/* User Info */}
+        {user && !collapsed && (
+          <div className="px-3 py-2 rounded-lg bg-sidebar-accent/50 border border-border/50">
+            <div className="flex items-center gap-2 mb-1">
+              <User className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs font-medium text-foreground truncate">
+                {user.email}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Logout Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={logout}
+          className={cn(
+            "w-full",
+            collapsed ? "justify-center px-2" : "justify-start px-3"
+          )}
+        >
+          <LogOut className="w-4 h-4" />
+          {!collapsed && <span className="ml-2 text-xs">Déconnexion</span>}
+        </Button>
+
+        {/* Collapse Button */}
         <Button
           variant="ghost"
           size="sm"
