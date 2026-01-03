@@ -16,7 +16,7 @@ interface StatCardProps {
 export function StatCard({ title, value, icon, trend, className }: StatCardProps) {
   return (
     <div className={cn("stat-card group cursor-default", className)}>
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex items-start justify-between mb-3 sm:mb-4">
         <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
           {icon}
         </div>
@@ -38,8 +38,8 @@ export function StatCard({ title, value, icon, trend, className }: StatCardProps
           </div>
         )}
       </div>
-      <p className="metric-label mb-1">{title}</p>
-      <p className="metric-value text-foreground">{value}</p>
+      <p className="metric-label mb-1 text-sm sm:text-base">{title}</p>
+      <p className="metric-value text-foreground text-xl sm:text-2xl md:text-3xl">{value}</p>
     </div>
   );
 }

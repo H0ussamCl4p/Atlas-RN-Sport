@@ -14,8 +14,31 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        heading: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['DM Sans', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        body: ['DM Sans', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        // Hero / Display
+        'display-2xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '900' }], // 72px
+        'display-xl': ['3.75rem', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '800' }], // 60px
+        'display-lg': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '800' }], // 48px
+        
+        // Headings
+        'heading-xl': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }], // 36px
+        'heading-lg': ['1.875rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '700' }], // 30px
+        'heading-md': ['1.5rem', { lineHeight: '1.4', letterSpacing: '-0.01em', fontWeight: '600' }], // 24px
+        'heading-sm': ['1.25rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '600' }], // 20px
+        
+        // Body
+        'body-lg': ['1.125rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }], // 18px
+        'body-md': ['1rem', { lineHeight: '1.6', letterSpacing: '0', fontWeight: '400' }], // 16px
+        'body-sm': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '400' }], // 14px
+        
+        // UI
+        'ui-lg': ['0.9375rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '500' }], // 15px
+        'ui-md': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0', fontWeight: '500' }], // 14px
+        'ui-sm': ['0.8125rem', { lineHeight: '1.5', letterSpacing: '0.01em', fontWeight: '500' }], // 13px
       },
       colors: {
         border: "hsl(var(--border))",

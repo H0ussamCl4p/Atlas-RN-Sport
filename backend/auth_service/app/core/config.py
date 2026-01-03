@@ -31,6 +31,10 @@ class Settings(BaseSettings):
         "http://localhost:5173",  # React dev server
         "http://localhost:3000",
         "http://localhost:8080",
+        "http://10.33.212.190:5173",  # Network access
+        "http://192.168.56.1:5173",   # Network access
+        "http://192.168.137.1:5173",  # Network access
+        "http://172.22.224.1:5173",   # Network access
     ]
     
     # Database configuration

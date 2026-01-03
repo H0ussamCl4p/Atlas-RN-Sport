@@ -11,8 +11,8 @@ export function MainLayout({ children }: MainLayoutProps) {
     <OnboardingFlow>
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <main className="pl-64 min-h-screen transition-all duration-300">
-          <div className="p-8">
+        <main className="min-h-screen transition-all duration-300 md:pl-16 lg:pl-64 pt-14 md:pt-0">
+          <div className="p-4 sm:p-6 md:p-8">
             {children}
           </div>
         </main>
