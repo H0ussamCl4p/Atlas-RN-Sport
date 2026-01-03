@@ -298,29 +298,7 @@ export default function Landing() {
             </div>
 
             {/* Links */}
-            <div className="grid md:grid-cols-4 gap-8 mb-12">
-              <div>
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
-                  Produit
-                </h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground transition-colors">Fonctionnalités</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Tarifs</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Documentation</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
-                  Entreprise
-                </h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground transition-colors">À propos</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Carrières</a></li>
-                </ul>
-              </div>
-
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
               <div>
                 <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
                   Ressources
