@@ -12,7 +12,8 @@ interface FootballPitchProps {
   players?: Player[];
   heatmapData?: { x: number; y: number; intensity: number }[];
   showHeatmap?: boolean;
-  dangerZones?: { x: number; y: number; radius: number }[];
+  dangerZones?: { x: number; y: number; radius: number; label?: string }[];
+  title?: string;
   className?: string;
 }
 
@@ -46,13 +47,14 @@ export function FootballPitch({
   players = mockPlayers,
   showHeatmap = false,
   dangerZones = [],
+  title = "Vue tactique 2D",
   className,
 }: FootballPitchProps) {
   return (
     <div className={cn("glass-card p-6", className)}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-heading font-semibold text-lg text-foreground">
-          Vue tactique 2D
+          {title}
         </h3>
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-2">
@@ -107,7 +109,7 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Center line */}
           <line
             x1="2"
@@ -117,7 +119,7 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Center circle */}
           <circle
             cx="34"
@@ -127,10 +129,10 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Center dot */}
           <circle cx="34" cy="52.5" r="0.5" fill="hsl(var(--field-lines))" />
-          
+
           {/* Top penalty area */}
           <rect
             x="13.84"
@@ -141,7 +143,7 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Top goal area */}
           <rect
             x="24.84"
@@ -152,10 +154,10 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Top penalty spot */}
           <circle cx="34" cy="13" r="0.5" fill="hsl(var(--field-lines))" />
-          
+
           {/* Top penalty arc */}
           <path
             d="M 25 18.5 A 9.15 9.15 0 0 0 43 18.5"
@@ -163,7 +165,7 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Bottom penalty area */}
           <rect
             x="13.84"
@@ -174,7 +176,7 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Bottom goal area */}
           <rect
             x="24.84"
@@ -185,10 +187,10 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Bottom penalty spot */}
           <circle cx="34" cy="92" r="0.5" fill="hsl(var(--field-lines))" />
-          
+
           {/* Bottom penalty arc */}
           <path
             d="M 25 86.5 A 9.15 9.15 0 0 1 43 86.5"
@@ -196,12 +198,32 @@ export function FootballPitch({
             stroke="hsl(var(--field-lines))"
             strokeWidth="0.3"
           />
-          
+
           {/* Corner arcs */}
-          <path d="M 2 3 A 1 1 0 0 0 3 2" fill="none" stroke="hsl(var(--field-lines))" strokeWidth="0.3" />
-          <path d="M 65 2 A 1 1 0 0 0 66 3" fill="none" stroke="hsl(var(--field-lines))" strokeWidth="0.3" />
-          <path d="M 66 102 A 1 1 0 0 0 65 103" fill="none" stroke="hsl(var(--field-lines))" strokeWidth="0.3" />
-          <path d="M 3 103 A 1 1 0 0 0 2 102" fill="none" stroke="hsl(var(--field-lines))" strokeWidth="0.3" />
+          <path
+            d="M 2 3 A 1 1 0 0 0 3 2"
+            fill="none"
+            stroke="hsl(var(--field-lines))"
+            strokeWidth="0.3"
+          />
+          <path
+            d="M 65 2 A 1 1 0 0 0 66 3"
+            fill="none"
+            stroke="hsl(var(--field-lines))"
+            strokeWidth="0.3"
+          />
+          <path
+            d="M 66 102 A 1 1 0 0 0 65 103"
+            fill="none"
+            stroke="hsl(var(--field-lines))"
+            strokeWidth="0.3"
+          />
+          <path
+            d="M 3 103 A 1 1 0 0 0 2 102"
+            fill="none"
+            stroke="hsl(var(--field-lines))"
+            strokeWidth="0.3"
+          />
         </svg>
 
         {/* Players */}

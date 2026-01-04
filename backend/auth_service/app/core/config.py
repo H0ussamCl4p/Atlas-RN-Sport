@@ -29,12 +29,17 @@ class Settings(BaseSettings):
     # CORS settings for frontend communication
     CORS_ORIGINS: list[str] = [
         "http://localhost:5173",  # React dev server
+        "http://localhost:5174",  # React dev server (alternate port)
         "http://localhost:3000",
         "http://localhost:8080",
         "http://10.33.212.190:5173",  # Network access
+        "http://10.33.212.190:5174",  # Network access
         "http://192.168.56.1:5173",   # Network access
+        "http://192.168.56.1:5174",   # Network access
         "http://192.168.137.1:5173",  # Network access
+        "http://192.168.137.1:5174",  # Network access
         "http://172.22.224.1:5173",   # Network access
+        "http://172.22.224.1:5174",   # Network access
     ]
     
     # Database configuration

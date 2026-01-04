@@ -1,26 +1,36 @@
 import { useState, useCallback } from "react";
 import { Upload, Film, CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import {
+  uploadVideo,
+  createAnalysis,
+  pollAnalysisStatus,
+  type AnalysisResponse,
+} from "@/services/aiService";
 
 type UploadState = "idle" | "uploading" | "processing" | "complete" | "error";
 
 const processingSteps = [
-  { id: 1, label: "Téléversement de la vidéo...", duration: 2000 },
-  { id: 2, label: "Détection des joueurs...", duration: 3000 },
-  { id: 3, label: "Classification des équipes...", duration: 2000 },
-  { id: 4, label: "Analyse de la formation...", duration: 2500 },
-  { id: 5, label: "Calcul des zones à risque...", duration: 2000 },
-  { id: 6, label: "Génération des heatmaps...", duration: 1500 },
+  { id: 1, label: "Téléversement de la vidéo...", status: "upload" },
+  { id: 2, label: "Création de l'analyse...", status: "create" },
+  { id: 3, label: "Détection des joueurs...", status: "processing" },
+  { id: 4, label: "Classification des équipes...", status: "processing" },
+  { id: 5, label: "Analyse tactique...", status: "processing" },
+  { id: 6, label: "Finalisation...", status: "processing" },
 ];
 
 export function UploadZone() {
+  const navigate = useNavigate();
   const [state, setState] = useState<UploadState>("idle");
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [dragActive, setDragActive] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -32,71 +42,162 @@ export function UploadZone() {
     }
   }, []);
 
-  const simulateProcessing = useCallback(() => {
-    setState("uploading");
-    setProgress(0);
-    setCurrentStep(0);
+  const processVideo = useCallback(async (file: File) => {
+    try {
+      // Step 1: Upload video
+      setState("uploading");
+      setProgress(0);
+      setCurrentStep(0);
+      setErrorMessage("");
 
-    let totalProgress = 0;
-    const totalDuration = processingSteps.reduce((acc, step) => acc + step.duration, 0);
+      const videoResponse = await uploadVideo(file, (uploadProgress) => {
+        setProgress(uploadProgress * 0.3); // Upload is 30% of total
+      });
 
-    processingSteps.forEach((step, index) => {
-      const stepProgress = (step.duration / totalDuration) * 100;
-      
-      setTimeout(() => {
-        setCurrentStep(index);
-        if (index > 0) setState("processing");
-        
-        const startProgress = totalProgress;
-        const endProgress = totalProgress + stepProgress;
-        const startTime = Date.now();
-        
-        const animate = () => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / step.duration, 1);
-          setProgress(startProgress + (endProgress - startProgress) * progress);
-          
-          if (progress < 1) {
-            requestAnimationFrame(animate);
+      // Step 2: Create analysis
+      setCurrentStep(1);
+      setProgress(30);
+
+      const analysisResponse = await createAnalysis(videoResponse.id);
+      console.log("Analysis created with ID:", analysisResponse.id);
+      setAnalysisId(analysisResponse.id);
+
+      // Step 3: Poll for analysis completion
+      setState("processing");
+      setCurrentStep(2);
+      setProgress(40);
+
+      await pollAnalysisStatus(
+        analysisResponse.id,
+        (analysis: AnalysisResponse) => {
+          // Update progress based on status
+          if (analysis.status === "processing") {
+            const stepIndex = Math.min(
+              currentStep + 1,
+              processingSteps.length - 1
+            );
+            setCurrentStep(stepIndex);
+            setProgress(40 + (stepIndex - 1) * 10);
           }
-        };
-        
-        requestAnimationFrame(animate);
-        totalProgress = endProgress;
-      }, processingSteps.slice(0, index).reduce((acc, s) => acc + s.duration, 0));
-    });
+        },
+        120, // 120 attempts
+        5000 // 5 seconds interval
+      );
 
-    setTimeout(() => {
+      // Analysis complete!
       setState("complete");
       setProgress(100);
-    }, totalDuration);
+      setCurrentStep(processingSteps.length - 1);
+    } catch (error) {
+      console.error("Video processing error:", error);
+      setState("error");
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Une erreur s'est produite lors du traitement"
+      );
+    }
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
 
-    const files = e.dataTransfer.files;
-    if (files && files[0]) {
-      setFileName(files[0].name);
-      simulateProcessing();
-    }
-  }, [simulateProcessing]);
+      const files = e.dataTransfer.files;
+      if (files && files[0]) {
+        const file = files[0];
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files[0]) {
-      setFileName(files[0].name);
-      simulateProcessing();
-    }
-  }, [simulateProcessing]);
+        // Validate file type
+        const validTypes = [
+          "video/mp4",
+          "video/avi",
+          "video/mov",
+          "video/mkv",
+          "video/x-matroska",
+        ];
+        if (
+          !validTypes.includes(file.type) &&
+          !file.name.match(/\.(mp4|avi|mov|mkv)$/i)
+        ) {
+          setState("error");
+          setErrorMessage(
+            "Format de fichier non supporté. Utilisez MP4, AVI, MOV ou MKV."
+          );
+          return;
+        }
+
+        // Validate file size (max 500MB)
+        if (file.size > 500 * 1024 * 1024) {
+          setState("error");
+          setErrorMessage("Fichier trop volumineux. Maximum 500 MB.");
+          return;
+        }
+
+        setFileName(file.name);
+        processVideo(file);
+      }
+    },
+    [processVideo]
+  );
+
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (files && files[0]) {
+        const file = files[0];
+
+        // Validate file type
+        const validTypes = [
+          "video/mp4",
+          "video/avi",
+          "video/mov",
+          "video/mkv",
+          "video/x-matroska",
+        ];
+        if (
+          !validTypes.includes(file.type) &&
+          !file.name.match(/\.(mp4|avi|mov|mkv)$/i)
+        ) {
+          setState("error");
+          setErrorMessage(
+            "Format de fichier non supporté. Utilisez MP4, AVI, MOV ou MKV."
+          );
+          return;
+        }
+
+        // Validate file size (max 500MB)
+        if (file.size > 500 * 1024 * 1024) {
+          setState("error");
+          setErrorMessage("Fichier trop volumineux. Maximum 500 MB.");
+          return;
+        }
+
+        setFileName(file.name);
+        processVideo(file);
+      }
+    },
+    [processVideo]
+  );
 
   const resetUpload = () => {
     setState("idle");
     setProgress(0);
     setCurrentStep(0);
     setFileName("");
+    setErrorMessage("");
+    setAnalysisId(null);
+  };
+
+  const viewResults = () => {
+    console.log("viewResults called with analysisId:", analysisId);
+    if (analysisId) {
+      navigate(`/analysis/${analysisId}`);
+    } else {
+      console.error("No analysisId available for navigation");
+      setErrorMessage("ID d'analyse manquant. Veuillez réessayer.");
+    }
   };
 
   return (
@@ -120,24 +221,28 @@ export function UploadZone() {
             onChange={handleFileSelect}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
-          
-          <div className={cn(
-            "w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-2xl bg-primary/10 flex items-center justify-center transition-all duration-300",
-            dragActive && "bg-primary/20 scale-110"
-          )}>
-            <Upload className={cn(
-              "w-8 h-8 sm:w-10 sm:h-10 text-primary transition-transform duration-300",
-              dragActive && "scale-110"
-            )} />
+
+          <div
+            className={cn(
+              "w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-2xl bg-primary/10 flex items-center justify-center transition-all duration-300",
+              dragActive && "bg-primary/20 scale-110"
+            )}
+          >
+            <Upload
+              className={cn(
+                "w-8 h-8 sm:w-10 sm:h-10 text-primary transition-transform duration-300",
+                dragActive && "scale-110"
+              )}
+            />
           </div>
-          
+
           <h3 className="font-heading font-semibold text-lg sm:text-xl text-foreground mb-2">
             Glissez votre vidéo ici
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground mb-4 sm:mb-6">
             ou cliquez pour sélectionner un fichier
           </p>
-          
+
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
             <span className="flex items-center gap-1.5">
               <Film className="w-4 h-4" />
@@ -161,7 +266,9 @@ export function UploadZone() {
               <h3 className="font-heading font-semibold text-base sm:text-lg text-foreground truncate">
                 Analyse en cours
               </h3>
-              <p className="text-xs sm:text-sm text-muted-foreground truncate">{fileName}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                {fileName}
+              </p>
             </div>
           </div>
 
@@ -203,19 +310,28 @@ export function UploadZone() {
           <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full bg-success/10 flex items-center justify-center glow-effect">
             <CheckCircle className="w-7 h-7 sm:w-8 sm:h-8 text-success" />
           </div>
-          
+
           <h3 className="font-heading font-semibold text-lg sm:text-xl text-foreground mb-2">
             Analyse terminée!
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground mb-6">
             Votre vidéo a été analysée avec succès
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <Button variant="outline" onClick={resetUpload} className="w-full sm:w-auto min-h-[44px]">
+            <Button
+              variant="outline"
+              onClick={resetUpload}
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               Nouvelle analyse
             </Button>
-            <Button variant="glow" className="w-full sm:w-auto min-h-[44px]">
+            <Button
+              variant="glow"
+              onClick={viewResults}
+              disabled={!analysisId}
+              className="w-full sm:w-auto min-h-[44px]"
+            >
               Voir les résultats
             </Button>
           </div>
@@ -227,15 +343,19 @@ export function UploadZone() {
           <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 sm:mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
             <AlertCircle className="w-7 h-7 sm:w-8 sm:h-8 text-destructive" />
           </div>
-          
+
           <h3 className="font-heading font-semibold text-lg sm:text-xl text-foreground mb-2">
             Erreur lors de l'analyse
           </h3>
           <p className="text-sm sm:text-base text-muted-foreground mb-6">
-            Une erreur s'est produite. Veuillez réessayer.
+            {errorMessage || "Une erreur s'est produite. Veuillez réessayer."}
           </p>
-          
-          <Button variant="outline" onClick={resetUpload} className="w-full sm:w-auto min-h-[44px]">
+
+          <Button
+            variant="outline"
+            onClick={resetUpload}
+            className="w-full sm:w-auto min-h-[44px]"
+          >
             Réessayer
           </Button>
         </div>

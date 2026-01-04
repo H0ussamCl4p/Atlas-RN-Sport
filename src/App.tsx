@@ -60,7 +60,7 @@ const App = () => (
               }
             />
             <Route
-              path="/analysis/:id"
+              path="/analysis/:analysisId"
               element={
                 <ProtectedRoute>
                   <Analysis />
