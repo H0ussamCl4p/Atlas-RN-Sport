@@ -25,15 +25,15 @@ async def lifespan(app: FastAPI):
     """
     # Startup: Initialize database
     init_db()
-    print(f"✓ Database initialized")
-    print(f"✓ {settings.APP_NAME} v{settings.APP_VERSION} started")
-    print(f"✓ Environment: {settings.ENVIRONMENT}")
-    print(f"✓ API docs: http://{settings.HOST}:{settings.PORT}/docs")
+    print(f"Database initialized")
+    print(f"{settings.APP_NAME} v{settings.APP_VERSION} started")
+    print(f"Environment: {settings.ENVIRONMENT}")
+    print(f"API docs: http://{settings.HOST}:{settings.PORT}/docs")
     
     yield
     
     # Shutdown: Cleanup resources
-    print(f"✓ {settings.APP_NAME} shutting down")
+    print(f"{settings.APP_NAME} shutting down")
 
 
 # Create FastAPI application

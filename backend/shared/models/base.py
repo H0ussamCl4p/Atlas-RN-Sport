@@ -4,14 +4,27 @@ Base database models and mixins for Atlas platform.
 Design: Shared across all microservices for consistency.
 Each service imports these base classes for their domain models.
 """
+import os
 import uuid
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import Column, DateTime, Boolean
+from sqlalchemy import Column, DateTime, Boolean, create_engine
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
+
+
+# ============================================================================
+# Database Engine & Session Factory
+# ============================================================================
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./atlas_dev.db")
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 # ============================================================================

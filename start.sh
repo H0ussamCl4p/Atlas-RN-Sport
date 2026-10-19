@@ -1,84 +1,55 @@
 #!/bin/bash
 
-# Atlas - Quick Start Script
-# This script starts both backend and frontend for the authentication demo
-
-echo "======================================"
 echo "Atlas - Football Analytics Platform"
-echo "======================================"
-echo ""
 
-# Check if backend directory exists
-if [ ! -d "backend/auth_service" ]; then
-    echo "❌ Backend directory not found!"
-    echo "Please ensure you're in the Atlas root directory."
+if [ ! -d "backend/auth_service" ] || [ ! -d "frontend" ]; then
+    echo "Error: Required directories (backend/ or frontend/) not found."
     exit 1
 fi
 
-# Start backend in background
-echo "🚀 Starting FastAPI backend on http://localhost:8001..."
-cd backend/auth_service
+ROOT_DIR=$(pwd)
 
-# Create virtual environment if it doesn't exist
+# 1. Start Auth Service (:8001)
+echo "Starting Auth Service on http://localhost:8001..."
+cd "$ROOT_DIR/backend/auth_service"
+
 if [ ! -d "venv" ]; then
-    echo "📦 Creating Python virtual environment..."
     python -m venv venv
 fi
 
-# Activate virtual environment
 source venv/bin/activate
-
-# Install dependencies
-echo "📦 Installing backend dependencies..."
 pip install -r requirements.txt > /dev/null 2>&1
 
-# Create .env file if it doesn't exist
-if [ ! -f ".env" ]; then
-    echo "⚙️  Creating .env file..."
+if [ ! -f ".env" ] && [ -f ".env.example" ]; then
     cp .env.example .env
 fi
 
-# Initialize database
-echo "🗄️  Initializing database..."
 python -c "from app.db.session import init_db; init_db()"
-
-# Start backend
-echo "✅ Backend starting..."
 python app/main.py &
-BACKEND_PID=$!
+AUTH_PID=$!
 
-cd ../..
+# 2. Start AI Service (:8002)
+echo "Starting AI Service on http://localhost:8002..."
+cd "$ROOT_DIR/backend/ai_service"
+if [ ! -f ".env" ] && [ -f ".env.example" ]; then
+    cp .env.example .env
+fi
+python app/main_simple.py &
+AI_PID=$!
 
-# Wait for backend to start
-echo "⏳ Waiting for backend to be ready..."
-sleep 3
-
-# Start frontend
-echo ""
-echo "🎨 Starting React frontend on http://localhost:5173..."
-echo ""
-
+# 3. Start Frontend (:5173)
+echo "Starting Frontend on http://localhost:5173..."
+cd "$ROOT_DIR/frontend"
 npm run dev &
 FRONTEND_PID=$!
 
-# Wait for user to quit
-echo ""
-echo "======================================"
-echo "✅ Atlas is running!"
-echo "======================================"
-echo ""
-echo "Backend:  http://localhost:8001"
-echo "Frontend: http://localhost:5173"
-echo ""
-echo "Demo Login:"
-echo "  Email:    demo@atlas.ai"
-echo "  Password: Demo123!"
-echo ""
-echo "Press Ctrl+C to stop all services..."
-echo ""
+cd "$ROOT_DIR"
 
-# Trap Ctrl+C to kill both processes
-trap "kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit" INT
+echo "All services running:"
+echo "  Auth Service: http://localhost:8001"
+echo "  AI Service:   http://localhost:8002"
+echo "  Frontend:     http://localhost:5173"
+echo "Press Ctrl+C to stop all services."
 
-# Wait
+trap "kill $AUTH_PID $AI_PID $FRONTEND_PID 2>/dev/null; exit" INT
 wait

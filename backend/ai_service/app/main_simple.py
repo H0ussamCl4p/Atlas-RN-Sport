@@ -1,7 +1,7 @@
 """
 Atlas AI Service - Simplified Main Application (MVP Demo)
 
-⚠️ IMPORTANT: This is a simplified version for MVP demo purposes.
+IMPORTANT: This is a simplified version for MVP demo purposes.
 Real production implementation would include:
 
 - YOLO v8/v9 for player detection
@@ -57,7 +57,7 @@ settings = Settings()
 # This provides instant results without YOLO processing overhead
 USE_REAL_PROCESSOR = False
 PROCESSOR_AVAILABLE = False
-print("✓ Using optimized mock data (no YOLO processing)")
+print("Using optimized mock data (no YOLO processing)")
 
 
 @asynccontextmanager
@@ -66,20 +66,21 @@ async def lifespan(app: FastAPI):
     # Create upload directory
     Path(settings.UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
     
-    print(f"✓ {settings.SERVICE_NAME} v{settings.SERVICE_VERSION} started")
-    print(f"✓ Environment: {settings.ENVIRONMENT}")
-    print(f"✓ Upload folder: {settings.UPLOAD_FOLDER}")
-    print(f"✓ API docs: http://{settings.HOST}:{settings.PORT}/docs")
+    print(f"{settings.SERVICE_NAME} v{settings.SERVICE_VERSION} started")
+    print(f"Environment: {settings.ENVIRONMENT}")
+    print(f"Upload folder: {settings.UPLOAD_FOLDER}")
+    print(f"API docs: http://{settings.HOST}:{settings.PORT}/docs")
     
     # Initialize real processor if available
     if USE_REAL_PROCESSOR and settings.ROBOFLOW_API_KEY:
         try:
+            from app.services.real_processor import get_analyzer
             analyzer = get_analyzer(settings.ROBOFLOW_API_KEY)
-            print("✓ Real video analyzer initialized with YOLO models")
+            print("Real video analyzer initialized with YOLO models")
         except Exception as e:
-            print(f"⚠ Could not initialize real analyzer: {e}")
+            print(f"Could not initialize real analyzer: {e}")
     elif USE_REAL_PROCESSOR and not settings.ROBOFLOW_API_KEY:
-        print("⚠ ROBOFLOW_API_KEY not set - will use mock data")
+        print("ROBOFLOW_API_KEY not set - will use mock data")
         print("  Set ROBOFLOW_API_KEY in .env to enable real video processing")
     
     yield
@@ -197,7 +198,7 @@ async def upload_video(file: UploadFile = File(...)):
         CHUNK_SIZE = 2 * 1024 * 1024  # 2MB chunks for faster uploads
         MAX_SIZE = 500 * 1024 * 1024  # 500MB max
         
-        print(f"📥 Receiving upload: {file.filename}")
+        print(f"Receiving upload: {file.filename}")
         
         with open(upload_path, "wb") as buffer:
             while True:
@@ -238,7 +239,7 @@ async def upload_video(file: UploadFile = File(...)):
         
         file_size_mb = file_size / 1024 / 1024
         est_time = int(file_size_mb * 0.5)  # ~0.5 sec per MB
-        print(f"✅ Video uploaded: {file.filename} ({file_size_mb:.1f}MB, est. {est_time}s to process)")
+        print(f"Video uploaded: {file.filename} ({file_size_mb:.1f}MB, est. {est_time}s to process)")
         
         return VideoResponse(**video)
     
@@ -249,7 +250,7 @@ async def upload_video(file: UploadFile = File(...)):
         # Clean up on error
         if upload_path.exists():
             upload_path.unlink()
-        print(f"❌ Upload error: {str(e)}")
+        print(f"Upload error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 
@@ -451,7 +452,7 @@ async def process_analysis_background(analysis_id: str):
     
     try:
         # Generate mock analysis data instantly
-        print(f"📊 Generating tactical analysis for {analysis_id}")
+        print(f"Generating tactical analysis for {analysis_id}")
         
         # Small delay to simulate processing (cosmetic)
         await asyncio.sleep(0.5)
@@ -460,10 +461,10 @@ async def process_analysis_background(analysis_id: str):
             analyses_db[analysis_id]["status"] = "completed"
             analyses_db[analysis_id]["output_data"] = generate_mock_analysis_results()
             analyses_db[analysis_id]["updated_at"] = datetime.utcnow().isoformat()
-            print(f"✅ Analysis complete: {analysis_id}")
+            print(f"Analysis complete: {analysis_id}")
             
     except Exception as e:
-        print(f"❌ Analysis processing failed: {e}")
+        print(f"Analysis processing failed: {e}")
         if analysis_id in analyses_db:
             analyses_db[analysis_id]["status"] = "failed"
             analyses_db[analysis_id]["processing_error"] = str(e)

@@ -34,20 +34,20 @@ def migrate():
         for migration_sql in migrations:
             try:
                 cursor.execute(migration_sql)
-                print(f"✓ {migration_sql}")
+                print(f"{migration_sql}")
             except sqlite3.OperationalError as e:
                 if "duplicate column name" in str(e).lower():
                     print(f"⊗ Column already exists: {migration_sql}")
                 else:
-                    print(f"✗ Error: {e}")
+                    print(f"Error: {e}")
                     raise
         
         conn.commit()
-        print("\n✓ Migration completed successfully!")
+        print("\nMigration completed successfully!")
         
     except Exception as e:
         conn.rollback()
-        print(f"\n✗ Migration failed: {e}")
+        print(f"\nMigration failed: {e}")
         raise
     finally:
         conn.close()

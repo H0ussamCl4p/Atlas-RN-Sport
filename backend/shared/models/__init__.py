@@ -16,7 +16,9 @@ from backend.shared.models.base import (
     MetadataMixin,
     SerializableMixin,
     ActiveRecordQuery,
-    get_json_type
+    get_json_type,
+    engine,
+    SessionLocal,
 )
 
 # User domain

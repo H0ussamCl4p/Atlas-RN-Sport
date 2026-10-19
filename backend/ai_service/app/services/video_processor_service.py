@@ -8,18 +8,15 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional
 import json
 
-# Ensure video_processor.py can be imported
-football_analysis_path = str(Path(__file__).parent.parent.parent.parent.parent)
-if football_analysis_path not in sys.path:
-    sys.path.append(football_analysis_path)
+# Ensure repository root is on sys.path
+repo_root = str(Path(__file__).resolve().parents[4])
+if repo_root not in sys.path:
+    sys.path.append(repo_root)
 
-# Ensure video_processor.py can be imported
-football_analysis_path = str(Path(__file__).parent.parent.parent.parent.parent)
-if football_analysis_path not in sys.path:
-    sys.path.append(football_analysis_path)
-
-# Import the original video processor
-from video_processor import FootballVideoProcessor
+try:
+    from video_processor import FootballVideoProcessor
+except ImportError:
+    FootballVideoProcessor = None
 
 
 class VideoProcessorService:

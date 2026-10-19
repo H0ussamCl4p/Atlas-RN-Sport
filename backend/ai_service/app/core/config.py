@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     MAX_VIDEO_SIZE_MB: int = 500
     
     # Models
-    MODEL_PATH: str = "./models/best_model.pth"
+    MODEL_PATH: str = "./models/tactical_vulnerability_complete.pth"
     
     # JWT
     JWT_SECRET_KEY: str = "your-secret-key-here"

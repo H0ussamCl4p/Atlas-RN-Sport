@@ -43,7 +43,7 @@ def create_demo_user():
         existing_user = session.query(User).filter(User.email == "demo@atlas.ai").first()
         
         if existing_user:
-            print("\n⚠️  Demo user already exists!")
+            print("\nDemo user already exists!")
             print(f"   Email: {existing_user.email}")
             print(f"   ID: {existing_user.id}")
             return
@@ -60,14 +60,14 @@ def create_demo_user():
         session.commit()
         session.refresh(demo_user)
         
-        print("\n✅ Demo user created successfully!")
+        print("\nDemo user created successfully!")
         print(f"   Email: {demo_user.email}")
         print(f"   Password: Demo123!")
         print(f"   ID: {demo_user.id}")
         print(f"   Full Name: {demo_user.full_name}")
         
     except Exception as e:
-        print(f"\n❌ Error creating demo user: {e}")
+        print(f"\nError creating demo user: {e}")
         session.rollback()
     finally:
         session.close()

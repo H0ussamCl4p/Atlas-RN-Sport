@@ -23,15 +23,15 @@ async def lifespan(app: FastAPI):
     # Create models directory
     Path(settings.MODEL_PATH).parent.mkdir(parents=True, exist_ok=True)
     
-    print(f"✓ {settings.SERVICE_NAME} v{settings.SERVICE_VERSION} started")
-    print(f"✓ Environment: {settings.ENVIRONMENT}")
-    print(f"✓ Upload folder: {settings.UPLOAD_FOLDER}")
-    print(f"✓ Model path: {settings.MODEL_PATH}")
-    print(f"✓ API docs: http://{settings.HOST}:{settings.PORT}/docs")
+    print(f"{settings.SERVICE_NAME} v{settings.SERVICE_VERSION} started")
+    print(f"Environment: {settings.ENVIRONMENT}")
+    print(f"Upload folder: {settings.UPLOAD_FOLDER}")
+    print(f"Model path: {settings.MODEL_PATH}")
+    print(f"API docs: http://{settings.HOST}:{settings.PORT}/docs")
     
     yield
     
-    print(f"✓ {settings.SERVICE_NAME} shutting down")
+    print(f"{settings.SERVICE_NAME} shutting down")
 
 
 # Create FastAPI app
