@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS — Football Tactical Intelligence</title>
+  <meta name="description" content="ATLAS transforms football match video, tracking data, and event streams into structured tactical intelligence using computer vision and Graph Neural Networks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-base: #070a0e;
+      --bg-surface: #0d131a;
+      --bg-elevated: #131c26;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(16, 185, 129, 0.35);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-green: #10b981;
+      --accent-green-dim: rgba(16, 185, 129, 0.12);
+      --accent-cyan: #0ea5e9;
+      --accent-amber: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(16, 185, 129, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(14, 165, 233, 0.06) 0%, transparent 40%);
+    }
+
+    /* Pitch grid background overlay */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-size: 48px 48px;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      background: rgba(7, 10, 14, 0.82);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.06em;
+    }
+
+    .brand-mark {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 12px var(--accent-green);
+    }
+
+    nav {
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    nav a:hover {
+      color: var(--text-primary);
+    }
+
+    .btn-repo {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border-accent);
+      background: var(--accent-green-dim);
+      color: var(--accent-green) !important;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem !important;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 96px 0 72px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-green);
+      background: var(--accent-green-dim);
+      border: 1px solid var(--border-accent);
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .lead {
+      font-size: 1.12rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin-bottom: 32px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .meta-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .meta-value {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    /* Tactical Pitch SVG Card */
+    .pitch-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .pitch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      margin-right: 6px;
+    }
+
+    /* Sections */
+    section {
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-index {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent-green);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      max-width: 680px;
+      font-size: 1.02rem;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .card-highlight {
+      border-color: var(--border-accent);
+      background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-surface) 100%);
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+
+    .badge-origin {
+      background: rgba(14, 165, 233, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+
+    .badge-upcoming {
+      background: var(--accent-green-dim);
+      color: var(--accent-green);
+      border: 1px solid var(--border-accent);
+    }
+
+    .badge-active {
+      background: rgba(245, 158, 11, 0.12);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .card h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-org {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+    }
+
+    /* Timeline list inside competition cards */
+    .phase-list {
+      list-style: none;
+      margin-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 16px;
+    }
+
+    .phase-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+      font-size: 0.88rem;
+    }
+
+    .phase-list li:last-child {
+      border-bottom: none;
+    }
+
+    .phase-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .phase-date {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    /* Origin Story Layout */
+    .origin-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 36px;
+    }
+
+    .origin-columns {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 40px;
+      margin-top: 24px;
+    }
+
+    .ack-group {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .ack-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .ack-names {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Team Section */
+    .team-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .team-role {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent-green);
+      margin-bottom: 12px;
+    }
+
+    .team-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .team-link:hover {
+      color: var(--accent-green);
+    }
+
+    footer {
+      padding: 48px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 860px) {
+      .hero-grid,
+      .grid-2,
+      .grid-3,
+      .origin-columns {
+        grid-template-columns: 1fr;
+      }
+      nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <header>
+    <div class="container nav-inner">
+      <a href="#" class="brand">
+        <span class="brand-mark"></span>
+        <span>ATLAS</span>
+      </a>
+      <nav>
+        <a href="#origins">RNSport 2026</a>
+        <a href="#competitions">Upcoming Hackathons</a>
+        <a href="#architecture">System Architecture</a>
+        <a href="#team">Team</a>
+        <a href="https://github.com/H0ussamCl4p/Atlas-RN-Sport" class="btn-repo" target="_blank" rel="noopener">GitHub Repository</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow">Football Tactical Intelligence</span>
+          <h1>Bridging Match Footage and Actionable Tactical Decisions</h1>
+          <p class="lead">
+            ATLAS is an automated football tactical analysis platform combining computer vision, spatial pitch projection, and Equivariant Graph Neural Networks (EGNN) to turn raw video and tracking streams into structured coaching insights.
+          </p>
+          <div class="hero-meta">
+            <div class="meta-item">
+              <span class="meta-label">Origin</span>
+              <span class="meta-value">RNSport Hackathon &amp; Congress 2026</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Institution</span>
+              <span class="meta-value">ENSAM Casablanca</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">2026–2027 Track</span>
+              <span class="meta-value">Barça Innovation Hub &middot; Microsoft</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="pitch-card">
+          <div class="pitch-header">
+            <span><span class="status-dot"></span>EGNN SPATIAL GRAPH // 105m &times; 68m</span>
+            <span>TACTICAL VULNERABILITY</span>
+          </div>
+          <svg viewBox="0 0 320 210" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="312" height="202" rx="4" fill="#09131c" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+            <line x1="160" y1="4" x2="160" y2="206" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+            <circle cx="160" cy="105" r="28" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+            <rect x="4" y="55" width="44" height="100" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+            <rect x="272" y="55" width="44" height="100" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="1.2" />
+
+            <!-- Vulnerability Zone Highlight -->
+            <circle cx="215" cy="72" r="26" fill="rgba(239, 68, 68, 0.16)" stroke="rgba(239, 68, 68, 0.45)" stroke-dasharray="3 3" />
+            <circle cx="185" cy="138" r="22" fill="rgba(16, 185, 129, 0.14)" stroke="rgba(16, 185, 129, 0.4)" />
+
+            <!-- Graph Edges -->
+            <g stroke="rgba(16, 185, 129, 0.35)" stroke-width="1">
+              <line x1="75" y1="55" x2="135" y2="68" />
+              <line x1="75" y1="105" x2="135" y2="68" />
+              <line x1="75" y1="105" x2="140" y2="125" />
+              <line x1="75" y1="155" x2="140" y2="125" />
+              <line x1="135" y1="68" x2="185" y2="138" />
+              <line x1="135" y1="68" x2="205" y2="82" />
+              <line x1="140" y1="125" x2="185" y2="138" />
+              <line x1="185" y1="138" x2="235" y2="110" />
+              <line x1="205" y1="82" x2="235" y2="110" />
+            </g>
+
+            <!-- Home Nodes -->
+            <g fill="#10b981" stroke="#070a0e" stroke-width="1.5">
+              <circle cx="26" cy="105" r="5" />
+              <circle cx="75" cy="55" r="5" />
+              <circle cx="75" cy="105" r="5" />
+              <circle cx="75" cy="155" r="5" />
+              <circle cx="135" cy="68" r="5.5" />
+              <circle cx="140" cy="125" r="5.5" />
+              <circle cx="185" cy="138" r="6" />
+              <circle cx="205" cy="82" r="5.5" />
+              <circle cx="235" cy="110" r="6" />
+            </g>
+
+            <!-- Away Nodes -->
+            <g fill="#0ea5e9" stroke="#070a0e" stroke-width="1.5">
+              <circle cx="294" cy="105" r="5" />
+              <circle cx="255" cy="62" r="5" />
+              <circle cx="252" cy="102" r="5" />
+              <circle cx="255" cy="148" r="5" />
+              <circle cx="195" cy="52" r="5" />
+              <circle cx="198" cy="105" r="5" />
+              <circle cx="170" cy="162" r="5" />
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 01: First Hackathon & Congress -->
+    <section id="origins">
+      <div class="section-header">
+        <span class="section-index">01 // Genesis &amp; Scientific Congress</span>
+        <h2>RNSport Hackathon &amp; International Congress 2026</h2>
+        <p class="section-subtitle">
+          Conceived in a 48-hour sprint in Agadir and presented at the International Congress on Digital Revolution in Sports.
+        </p>
+      </div>
+
+      <div class="origin-box">
+        <span class="badge badge-origin">Founding Milestone &middot; Agadir, Morocco</span>
+        <h3>From a 48-Hour Hackathon to the RNSport 2026 Congress</h3>
+        <div class="origin-columns">
+          <div>
+            <p>
+              ATLAS was originally built in 48 hours during the <strong>RNSport Hackathon</strong>, organized as part of the <strong>International Congress on Digital Revolution in Sports (RNSport 2026)</strong> in collaboration with <strong>Code 212 &ndash; Universit&eacute; Ibn Zohr (Agadir)</strong> and <strong>ENSA Agadir</strong>.
+            </p>
+            <p>
+              Selected among more than 60 applicant teams down to 10 finalist teams building AI solutions for major sporting events (from AFCON 2025 to the 2030 FIFA World Cup), our team represented <strong>ENSAM Casablanca</strong> and subsequently presented ATLAS to researchers and sports performance specialists at the RNSport 2026 International Congress.
+            </p>
+            <p>
+              Working under strict 48-hour constraints shaped ATLAS's core engineering philosophy: prioritizing end-to-end clarity from player tracking and homography projection to graph-based modeling of team formations, pressing intensity, expected goals (xG) threat zones, and defensive vulnerabilities.
+            </p>
+          </div>
+
+          <div>
+            <div class="ack-group" style="margin-top: 0; padding-top: 0; border-top: none;">
+              <div class="ack-title">Academic Mentors &amp; Supervisors</div>
+              <div class="ack-names">
+                Dr. Noureddine Soussi &middot; Dr. Brahim Erraha &middot; Dr. Khalid Tatane &middot; M. Lotfi Najdi &middot; M. Aziz Boufrioua &middot; Mme Najoua Ouallou &middot; M. Mourad Ait Abdellah &middot; Mme Laila Dahr &middot; Mme Sanae Mohim &middot; M. Adil Elhessnaoui &middot; M. Mehdi Iddouch
+              </div>
+            </div>
+
+            <div class="ack-group">
+              <div class="ack-title">Code 212 &ndash; Universit&eacute; Ibn Zohr &amp; Partners</div>
+              <div class="ack-names">
+                M. Adil Aoufi &middot; M. Hamza Elkina &middot; Mme Sara Jalloul &middot; M. Mousaab Aboujaafar &middot; M. Zakaria Essaim &middot; Mme Imane Charif &middot; M. Ayoub El Fahri &middot; ENSA Agadir &middot; Club Moov'up Fitness
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 02: Upcoming Hackathons -->
+    <section id="competitions">
+      <div class="section-header">
+        <span class="section-index">02 // Active &amp; Upcoming Competitions</span>
+        <h2>2026–2027 International Competition Track</h2>
+        <p class="section-subtitle">
+          Expanding ATLAS from video-only prototypes to official tracking data, event streams, and cloud-scale developer workflows.
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Competition 1: More Than a Hack 2027 -->
+        <div class="card card-highlight">
+          <span class="badge badge-upcoming">Barça Innovation Hub &middot; Metrica Sports</span>
+          <h3>More Than a Hack 2027</h3>
+          <div class="card-org">Mobile World Capital Barcelona &middot; Talent Arena</div>
+          <p>
+            An international sports analytics challenge led by <strong>Barça Innovation Hub</strong> and <strong>Metrica Sports</strong>, focused on turning official match footage, optical tracking data, and event data into breakthrough sporting performance insights.
+          </p>
+          <ul class="phase-list">
+            <li>
+              <span class="phase-name">Registration Window</span>
+              <span class="phase-date">01 Oct &ndash; 10 Nov 2026</span>
+            </li>
+            <li>
+              <span class="phase-name">Phase 1: Initial Challenge (Online)</span>
+              <span class="phase-date">20 Oct &ndash; 17 Nov 2026</span>
+            </li>
+            <li>
+              <span class="phase-name">Phase 2: Innovation Challenge (Top 20)</span>
+              <span class="phase-date">26 Nov 2026 &ndash; 14 Jan 2027</span>
+            </li>
+            <li>
+              <span class="phase-name">Final Live Pitch at Talent Arena (Top 5)</span>
+              <span class="phase-date">02 Mar 2027 &middot; Barcelona</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Competition 2: Inside the Game -->
+        <div class="card">
+          <span class="badge badge-active">Microsoft Innovation Studio</span>
+          <h3>Inside the Game: Developer Hackathon</h3>
+          <div class="card-org">Microsoft Corporation &middot; Hackathon #34887 / Project #126519</div>
+          <p>
+            Registered on <strong>Microsoft Innovation Studio</strong>, ATLAS competes in the <em>Inside the Game: Developer Hackathon</em> to advance automated tactical intelligence, interactive match visualization, and scalable AI inference pipelines for football analysts and coaching staffs.
+          </p>
+          <ul class="phase-list">
+            <li>
+              <span class="phase-name">Registered Project</span>
+              <span class="phase-date">ATLAS (#126519)</span>
+            </li>
+            <li>
+              <span class="phase-name">Platform</span>
+              <span class="phase-date">Microsoft Innovation Studio</span>
+            </li>
+            <li>
+              <span class="phase-name">Core Focus</span>
+              <span class="phase-date">AI Sports Analytics &amp; Real-Time Telemetry</span>
+            </li>
+            <li>
+              <span class="phase-name">Status</span>
+              <span class="phase-date">Active Development</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 03: Technical Architecture -->
+    <section id="architecture">
+      <div class="section-header">
+        <span class="section-index">03 // System Architecture</span>
+        <h2>How ATLAS Processes a Match</h2>
+        <p class="section-subtitle">
+          A modular pipeline separating computer vision extraction, spatio-temporal graph modeling, and interactive web visualization.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <span class="badge badge-origin">Stage 1 // Perception</span>
+          <h3>Detection, Tracking &amp; Homography</h3>
+          <p>
+            Processes raw broadcast footage using YOLO player/ball detection, ByteTrack multi-object tracking, SigLIP team clustering, and pitch keypoint homography to project pixel coordinates onto a standard 105m &times; 68m pitch plane.
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-upcoming">Stage 2 // Graph Intelligence</span>
+          <h3>Equivariant GNN (EGNN)</h3>
+          <p>
+            Constructs frame-level graphs where players act as nodes (`x, y, speed, direction, team, role, pressure`) and spatial interactions form edges, predicting line vulnerabilities, spacing overloads, key-player dependency, and counter-attack risk.
+          </p>
+        </div>
+
+        <div class="card">
+          <span class="badge badge-active">Stage 3 // Decision Interface</span>
+          <h3>Tactical Web Workbench</h3>
+          <p>
+            Built with React, TypeScript, and FastAPI microservices (`auth_service` and `ai_service`), providing coaches with interactive pitch maps, dynamic formations, numerical advantage breakdowns, and zone-level xG heatmaps.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 04: Team -->
+    <section id="team" style="border-bottom: none;">
+      <div class="section-header">
+        <span class="section-index">04 // Founding Team</span>
+        <h2>Built by Engineers from ENSAM Casablanca</h2>
+        <p class="section-subtitle">
+          The core engineering team behind ATLAS from the RNSport 2026 Hackathon to the 2026–2027 international competitions.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <div class="card team-card">
+          <div>
+            <div class="team-role">AI &amp; Full-Stack Architecture</div>
+            <h3>Houssam Choubik</h3>
+            <p>System architecture, computer vision &amp; GNN integration, and full-stack platform engineering.</p>
+          </div>
+          <a href="https://www.linkedin.com/in/houssam-choubik/" target="_blank" rel="noopener" class="team-link">LinkedIn Profile &rarr;</a>
+        </div>
+
+        <div class="card team-card">
+          <div>
+            <div class="team-role">Data Science &amp; Tactical Modeling</div>
+            <h3>Lyna Benlakhbaizi</h3>
+            <p>Tactical metrics extraction, database architecture, and spatial football analytics modeling.</p>
+          </div>
+          <a href="https://www.linkedin.com/in/lynabenlakhbaizi/" target="_blank" rel="noopener" class="team-link">LinkedIn Profile &rarr;</a>
+        </div>
+
+        <div class="card team-card">
+          <div>
+            <div class="team-role">Machine Learning &amp; AI Service</div>
+            <h3>Salwa Khattami</h3>
+            <p>Graph Neural Network training, video inference pipeline, and AI microservice development.</p>
+          </div>
+          <a href="https://www.linkedin.com/in/salwa-khattami/fr/" target="_blank" rel="noopener" class="team-link">LinkedIn Profile &rarr;</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      ATLAS &mdash; Football Tactical Intelligence &middot; ENSAM Casablanca &middot; <a href="https://github.com/H0ussamCl4p/Atlas-RN-Sport" style="color: var(--text-secondary);">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

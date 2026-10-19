@@ -1,44 +1,66 @@
-# ATLAS - Football Tactical Intelligence, Reinvented
+# ATLAS — Football Tactical Intelligence, Reinvented
 
-In modern football, tactical analysis is increasingly driven by data, yet extracting meaningful insights from match footage remains a time-consuming task, without true actionable insights.
+In modern football, tactical analysis is increasingly driven by data, yet extracting meaningful insights from match footage and tracking streams remains a time-consuming task without immediately actionable takeaways.
 
-Meet **ATLAS**, a web-based platform designed to automate tactical analysis by processing football match videos and transforming them into structured, actionable insights, from pressing and key players to xG threats and vulnerable spaces. ATLAS aims to **bridge the gap between raw match footage and actionable tactical intelligence**, enabling teams to prepare smarter, analyze faster, and gain a competitive advantage.
+**ATLAS** is a web-based platform designed to automate football tactical analysis by processing match videos, tracking coordinates, and event data into structured coaching intelligence—from dynamic formations and pressing intensity to Expected Goals (xG) threat zones, numerical superiorities, and defensive vulnerabilities modeled via Equivariant Graph Neural Networks (EGNN).
 
-This project was developed during the **RNSport Hackathon**, held as part of the **RNSport International Congress**, an event dedicated to innovation and research in sports science and performance analysis.
+---
 
-## Key Features
+## Hackathon History & Competition Roadmap
 
-- **Match Video Analysis**  
-  Upload a match video and let ATLAS process the entire game automatically.
+### 1. Founding Hackathon & Scientific Congress: RNSport 2026 (Agadir, Morocco)
 
-- **Tactical Information Extraction**  
-  Identify player positioning, team structure, and movement patterns.
+ATLAS was originally built in a **48-hour sprint** during the **RNSport Hackathon**, held as part of the **International Congress on Digital Revolution in Sports (RNSport 2026)** in collaboration with **Code 212 – Université Ibn Zohr (Agadir)** and **ENSA Agadir**.
 
-- **Advanced Tactical Insights**
-  - Dynamic formations
-  - Pressing intensity and zones, as well as vulnerable zones
-  - Player heatmaps and key positions
-  - Expected Goals (xG)
-  - Overload and threat analysis
-  - Tactical phases and transitions
+Selected among 60+ applicant teams down to 10 finalist teams developing AI solutions for major sporting events (from AFCON 2025 to the 2030 FIFA World Cup), our team represented **ENSAM Casablanca** and subsequently presented ATLAS at the **RNSport 2026 International Congress**.
 
-- **Visual Analytics**  
-  Clear visualizations that help analysts and coaches quickly understand the game.
+- **Core Team**:
+  - [Houssam Choubik](https://www.linkedin.com/in/houssam-choubik/)
+  - [Lyna Benlakhbaizi](https://www.linkedin.com/in/lynabenlakhbaizi/)
+  - [Salwa Khattami](https://www.linkedin.com/in/salwa-khattami/fr/)
+- **Academic Mentors & Acknowledgments**:
+  - Mentors & Professors: Dr. Noureddine Soussi, Dr. Brahim Erraha, Dr. Khalid Tatane, M. Lotfi Najdi, M. Aziz Boufrioua, Mme Najoua Ouallou, M. Mourad Ait Abdellah, Mme Laila Dahr, Mme Sanae Mohim, M. Adil Elhessnaoui, M. Mehdi Iddouch.
+  - Partners & Organizers: Code 212 – Université Ibn Zohr (M. Adil Aoufi, M. Hamza Elkina, Mme Sara Jalloul, M. Mousaab Aboujaafar, M. Zakaria Essaim, Mme Imane Charif, M. Ayoub El Fahri), ENSA Agadir, and sponsor Moov'up.
 
-- **Web-Based Platform**  
-  Accessible through a modern web interface.
+---
+
+### 2. Upcoming Competitions (2026–2027)
+
+#### A. More Than a Hack 2027 — Barça Innovation Hub & Metrica Sports
+Organized by **Mobile World Capital Barcelona (Talent Arena)**, **Barça Innovation Hub**, and **Metrica Sports**, challenging teams to turn official match footage, optical tracking data, and event data into new ideas that improve sporting performance.
+
+| Phase | Timeline | Format |
+| :--- | :--- | :--- |
+| **Registration** | 1 October – 10 November 2026 | Online |
+| **Initial Challenge** | 20 October – 17 November 2026 | Online |
+| **Innovation Challenge** | 26 November 2026 – 14 January 2027 | Online (Top 20 teams advance) |
+| **Final Pitch** | 2 March 2027 | Live at Talent Arena, Barcelona (Top 5 finalists) |
+
+#### B. Inside the Game: Developer Hackathon — Microsoft Innovation Studio
+ATLAS is registered as an official project (**Hackathon #34887 / Project #126519**) on **Microsoft Innovation Studio**, focusing on scalable AI tactical inference, interactive spatial telemetry, and developer-ready sports analytics workflows.
+
+---
+
+## Key Capabilities
+
+- **Match Video & Tracking Ingestion**: Process broadcast match videos (YOLO detection + ByteTrack + SigLIP team clustering + pitch homography) alongside structured tracking and event datasets.
+- **Equivariant Graph Neural Network (EGNN)**: Models players as graph nodes on a 105m x 68m pitch to evaluate defensive, midfield, and attacking line vulnerabilities, pressing susceptibility, spacing compactness, key-player dependency, and counter-attack risk.
+- **Interactive Tactical Workbench**: Visualizes dynamic formations, numerical advantage zones, threat/weakness heatmaps, and zone-based xG metrics.
+
+---
 
 ## Project Structure
 
 ```text
 Atlas-RN-Sport/
-├── frontend/                  # React + Vite + TypeScript web application (Port 5173)
-├── backend/                   # FastAPI services
-│   ├── auth_service/          # Authentication and user service (Port 8001)
-│   ├── ai_service/            # Video upload and tactical analysis service (Port 8002)
-│   └── shared/                # Shared SQLAlchemy models and database setup
-├── notebooks/                 # Jupyter notebooks for model and video inference
-├── video_data/                # Sample football match videos
-├── start.ps1                  # Windows startup script
-└── start.sh                   # Linux/macOS startup script
+├── docs/                      # GitHub Pages site (docs/index.html)
+├── frontend/                  # React 18 + Vite + TypeScript web application (Port 5173)
+├── backend/                   # Python FastAPI microservices
+│   ├── auth_service/          # JWT authentication & user onboarding service (Port 8001)
+│   ├── ai_service/            # Video upload & EGNN tactical analysis service (Port 8002)
+│   └── shared/                # Shared SQLAlchemy 2.0 ORM models & database setup
+├── notebooks/                 # Jupyter notebooks for CV + EGNN model verification
+├── video_data/                # Sample football match clips for testing
+├── start.ps1                  # Windows PowerShell launcher
+└── start.sh                   # Linux/macOS launcher
 ```
