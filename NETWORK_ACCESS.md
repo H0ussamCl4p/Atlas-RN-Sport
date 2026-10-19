@@ -1,9 +1,5 @@
 # Network Access Configuration Guide
 
-## ✅ Fixed! Your Atlas app is now accessible on your local network.
-
----
-
 ## 🌐 Your Network Addresses
 
 Based on your network configuration, Atlas is accessible at:
