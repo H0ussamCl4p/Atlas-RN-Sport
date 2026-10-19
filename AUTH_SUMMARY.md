@@ -2,7 +2,7 @@
 
 ## ✅ What Was Built
 
-A **production-ready authentication system** fully integrated with your existing FastAPI backend:
+A **production-ready authentication system** fully integrated with the existing FastAPI backend:
 
 ### 🔐 Core Features
 - **JWT Authentication** with automatic token refresh
