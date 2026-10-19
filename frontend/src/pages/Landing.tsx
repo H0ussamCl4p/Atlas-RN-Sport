@@ -1,333 +1,259 @@
-/**
- * Landing Page
- * 
- * Professional football analytics platform landing.
- * Editorial design, data-driven visuals, minimal aesthetic.
- * 
- * DESIGN PHILOSOPHY:
- * - Typography as main design tool
- * - Football-native SVG visuals (no photos)
- * - Asymmetrical editorial layouts
- * - Calm, confident animations
- * - Data > decoration
- */
-
-import { motion } from 'framer-motion';
-import { ArrowRight, BarChart3, Network, Zap } from 'lucide-react';
+import { ArrowRight, BarChart3, Network, Zap, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LandingNavbar } from '@/components/landing/LandingNavbar';
-import { ScrollIndicator } from '@/components/landing/ScrollIndicator';
 import { ScrollToTop } from '@/components/landing/ScrollToTop';
 import { Hero } from '@/components/landing/Hero';
-import { Section, SectionHeader, SectionSeparator } from '@/components/landing/Section';
 import { HeatmapBlock } from '@/components/landing/HeatmapBlock';
 import { NodeGraph } from '@/components/landing/NodeGraph';
 import { DataVisual } from '@/components/landing/DataVisual';
 import { SEO } from '@/components/seo/SEO';
-import { cardVariants, prefersReducedMotion } from '@/animations/analyticalVariants';
-import { grid } from '@/styles/spacing';
 
 export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* SEO Metadata */}
-      <SEO 
+    <div className="min-h-screen bg-background text-foreground">
+      <SEO
         title="Atlas — L'intelligence tactique du football par l'IA"
         description="Plateforme d'analyse tactique professionnelle. Transformez vos matchs en données exploitables avec l'IA."
         url="https://atlas-football.com"
       />
 
-      {/* Navigation */}
       <LandingNavbar />
 
-      {/* Hero Section */}
       <Hero />
 
-      {/* Scroll Indicator */}
-      <ScrollIndicator targetSectionId="features" />
-
-      {/* Scroll To Top Button */}
       <ScrollToTop showAfter={400} />
 
-      {/* Capabilities Section - Asymmetrical */}
-      <Section spacing="desktop" id="features">
-        <SectionHeader
-          title="Analyse tactique de niveau professionnel"
-          subtitle="Des outils conçus pour les coachs et analystes qui exigent la précision"
-          align="left"
-        />
-
-        {/* Text + Visual Grid */}
-        <div className={grid.asymmetrical.textLeft}>
-          <div className={grid.asymmetrical.textSpan + " space-y-8"}>
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">
-                Détection automatique
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Notre IA identifie joueurs, formations et mouvements tactiques en temps réel.
-                Analyse complète en moins de 5 minutes.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">
-                Heatmaps de précision
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Visualisez l'intensité du jeu par zone. Identifiez les déséquilibres,
-                les espaces exploitables, les patterns de pression.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">
-                Insights tactiques
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Rapports détaillés sur les phases de jeu, transitions, organisation défensive.
-                Données exploitables pour la préparation de match.
-              </p>
-            </div>
-          </div>
-
-          <div className={grid.asymmetrical.visualSpan}>
-            <HeatmapBlock />
-          </div>
-        </div>
-      </Section>
-
-      <SectionSeparator />
-
-      {/* Data Section - Reversed Asymmetry */}
-      <Section spacing="desktop" id="methodology">
-        <div className={grid.asymmetrical.textRight}>
-          <div className={grid.asymmetrical.visualSpan + " order-2 md:order-1"}>
-            <NodeGraph />
-          </div>
-
-          <div className={grid.asymmetrical.textSpan + " order-1 md:order-2 space-y-8"}>
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">
-                Réseau de passes
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Analysez les connexions entre joueurs. Identifiez les porteurs de ballon clés,
-                les triangles de construction, les circuits de jeu préférentiels.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">
-                Positionnement tactique
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Comprenez les mouvements collectifs, les rotations, les compensations.
-                Visualisez la structure tactique réelle de votre équipe.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">
-                Cohésion d'équipe
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Mesurez les distances entre lignes, la compacité, l'équilibre positionnel.
-                Optimisez l'organisation collective.
-              </p>
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      <SectionSeparator />
-
-      {/* Metrics Section */}
-      <Section spacing="tablet">
-        <SectionHeader
-          title="Des métriques qui comptent"
-          subtitle="Toutes les données tactiques essentielles, visualisées clairement"
-        />
-
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          <DataVisual
-            type="bar"
-            title="Performance tactique"
-            data={[
-              { label: 'Possession', value: 62 },
-              { label: 'Passes', value: 78 },
-              { label: 'Duels', value: 45 },
-              { label: 'Pressing', value: 71 },
-            ]}
-          />
-
-          <DataVisual
-            type="bar"
-            title="Zones d'efficacité"
-            data={[
-              { label: 'Tiers offensif', value: 58 },
-              { label: 'Tiers médian', value: 72 },
-              { label: 'Tiers défensif', value: 81 },
-              { label: 'Transitions', value: 65 },
-            ]}
-          />
-        </div>
-      </Section>
-
-      <SectionSeparator />
-
-      {/* Features Grid */}
-      <Section spacing="tablet" background="subtle">
-        <SectionHeader
-          title="Plateforme complète"
-          subtitle="Tout ce dont vous avez besoin pour analyser le football moderne"
-        />
-
-        <div className={grid.features}>
-          <motion.div
-            custom={0}
-            {...(!prefersReducedMotion && {
-              initial: "hidden",
-              whileInView: "visible",
-              variants: cardVariants,
-            })}
-            viewport={{ once: true, margin: '-50px' }}
-            className="p-8 border border-border/50 rounded-lg bg-card/30"
-          >
-            <BarChart3 className="w-8 h-8 text-primary mb-6" />
-            <h3 className="text-xl font-semibold text-foreground mb-3">
-              Analyse vidéo IA
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Traitement automatique de vos matchs. Détection des événements,
-              tracking des joueurs, classification des phases de jeu.
+      {/* Section 01: Capabilities — ReadMe-style architectural border-x container */}
+      <section id="features" className="relative border-b border-border">
+        <div className="mx-auto max-w-[1160px] border-x border-border px-6 sm:px-12 py-20 md:py-28">
+          <div className="max-w-3xl mb-16">
+            <span className="font-mono-eyebrow text-primary block mb-3">
+              01 // Perception &amp; Spatial Mapping
+            </span>
+            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground mb-4">
+              Analyse tactique de niveau professionnel
+            </h2>
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              Des outils conçus pour les coachs, analystes vidéo et directions sportives qui exigent une précision géométrique.
             </p>
-          </motion.div>
-
-          <motion.div
-            custom={1}
-            {...(!prefersReducedMotion && {
-              initial: "hidden",
-              whileInView: "visible",
-              variants: cardVariants,
-            })}
-            viewport={{ once: true, margin: '-50px' }}
-            className="p-8 border border-border/50 rounded-lg bg-card/30"
-          >
-            <Network className="w-8 h-8 text-primary mb-6" />
-            <h3 className="text-xl font-semibold text-foreground mb-3">
-              Rapports tactiques
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Générez des rapports détaillés. Partagez avec votre staff.
-              Exportez en PDF pour la préparation de match.
-            </p>
-          </motion.div>
-
-          <motion.div
-            custom={2}
-            {...(!prefersReducedMotion && {
-              initial: "hidden",
-              whileInView: "visible",
-              variants: cardVariants,
-            })}
-            viewport={{ once: true, margin: '-50px' }}
-            className="p-8 border border-border/50 rounded-lg bg-card/30"
-          >
-            <Zap className="w-8 h-8 text-primary mb-6" />
-            <h3 className="text-xl font-semibold text-foreground mb-3">
-              Analyse instantanée
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Résultats en 5 minutes. Pas d'attente. Décisions tactiques
-              prises rapidement, basées sur des données fiables.
-            </p>
-          </motion.div>
-        </div>
-      </Section>
-
-      {/* Final CTA - Minimal, Institutional */}
-      <Section spacing="desktop" id="cta">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-foreground tracking-tight leading-tight">
-            Transformez votre
-            <br />
-            approche tactique
-          </h2>
-
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            Rejoignez les clubs qui utilisent Atlas pour prendre des décisions
-            basées sur les données, pas sur l'intuition.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={() => navigate('/register')}
-              className="group inline-flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground font-medium text-lg rounded-sm hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
-            >
-              Commencer avec Atlas
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-            <button
-              onClick={() => navigate('/login')}
-              className="inline-flex items-center gap-3 px-8 py-4 border border-border text-foreground font-medium text-lg rounded-sm hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
-            >
-              Se connecter
-            </button>
           </div>
 
-          <p className="text-sm text-muted-foreground/70">
-            Configuration en 5 minutes · Analyse illimitée · Support expert
-          </p>
-        </div>
-      </Section>
-
-      {/* Footer - Minimal, Institutional */}
-      <footer className="border-t border-border/50 bg-background">
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-6xl mx-auto">
-            {/* Logo & Tagline */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-bold text-foreground mb-2">Atlas</h3>
-              <p className="text-sm text-muted-foreground">
-                L'intelligence tactique du football
-              </p>
-            </div>
-
-            {/* Links */}
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <div>
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
-                  Ressources
-                </h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground transition-colors">Guide tactique</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">API</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Support</a></li>
-                </ul>
+          <div className="grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-5 space-y-6">
+              <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Détection &amp; Tracking automatisés
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Identification des joueurs, formations et trajectoires en temps réel par vision par ordinateur et projection homographique 105m × 68m.
+                </p>
               </div>
 
-              <div>
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
-                  Légal
-                </h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-foreground transition-colors">Confidentialité</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Conditions</a></li>
-                  <li><a href="#" className="hover:text-foreground transition-colors">Sécurité</a></li>
-                </ul>
+              <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Heatmaps de pression et d'occupation
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Visualisez l'intensité du jeu par zone, identifiez les déséquilibres défensifs et détectez les demi-espaces exploitables.
+                </p>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+                <h3 className="text-lg font-bold text-foreground mb-2">
+                  Rapports d'avant-match exploitables
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Synthèses structurées sur les transitions, la dépendance au joueur clé et les vulnérabilités par ligne.
+                </p>
               </div>
             </div>
 
-            {/* Copyright */}
-            <div className="pt-8 border-t border-border/50">
-              <p className="text-sm text-muted-foreground/70">
-                © 2026 Atlas. Plateforme d'analyse tactique professionnelle.
+            <div className="lg:col-span-7">
+              <div className="p-4 rounded-2xl bg-card border border-border shadow-md">
+                <HeatmapBlock />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 02: Graph Intelligence */}
+      <section id="methodology" className="relative border-b border-border readme-grid-bg">
+        <div className="mx-auto max-w-[1160px] border-x border-border bg-background/90 backdrop-blur-sm px-6 sm:px-12 py-20 md:py-28">
+          <div className="grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-6 order-2 lg:order-1">
+              <div className="p-4 rounded-2xl bg-card border border-border shadow-md">
+                <NodeGraph />
+              </div>
+            </div>
+
+            <div className="lg:col-span-6 order-1 lg:order-2 space-y-6">
+              <span className="font-mono-eyebrow text-primary block">
+                02 // Equivariant Graph Neural Networks
+              </span>
+              <h2 className="font-heading text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+                Modélisation par graphe des dynamiques collectives
+              </h2>
+              <p className="text-base text-muted-foreground leading-relaxed">
+                Chaque joueur est modélisé comme un nœud connecté à ses partenaires et adversaires proches pour quantifier la structure collective au-delà des statistiques individuelles.
+              </p>
+
+              <ul className="space-y-3 pt-2">
+                <li className="flex items-start gap-3 text-sm text-foreground">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Réseau de passes &amp; centralité :</strong> identifiez le chef d'orchestre et les circuits préférentiels.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-foreground">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Compacité inter-lignes :</strong> mesurez l'étirement du bloc défensif et médian sous pression.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3 text-sm text-foreground">
+                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Prédiction multi-tâches :</strong> score de vulnérabilité par ligne, menace xG et risque de transition.
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 03: Metrics & Bento Grid */}
+      <section id="metrics" className="relative border-b border-border">
+        <div className="mx-auto max-w-[1160px] border-x border-border px-6 sm:px-12 py-20 md:py-28">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="font-mono-eyebrow text-primary block mb-3">
+              03 // Key Performance Telemetry
+            </span>
+            <h2 className="font-heading text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-4">
+              Des métriques qui comptent sur le terrain
+            </h2>
+            <p className="text-base text-muted-foreground">
+              Toutes les données tactiques essentielles, agrégées et hiérarchisées pour une lecture immédiate.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <DataVisual
+                type="bar"
+                title="Performance tactique collective"
+                data={[
+                  { label: 'Possession structurée', value: 62 },
+                  { label: 'Passes cassant des lignes', value: 78 },
+                  { label: 'Compacité défensive', value: 84 },
+                  { label: 'Intensité du pressing', value: 71 },
+                ]}
+              />
+            </div>
+
+            <div className="p-6 rounded-2xl bg-card border border-border shadow-sm">
+              <DataVisual
+                type="bar"
+                title="Contrôle spatial par zone"
+                data={[
+                  { label: 'Tiers offensif', value: 58 },
+                  { label: 'Demi-espaces médians', value: 76 },
+                  { label: 'Protection axe central', value: 81 },
+                  { label: 'Sécurité en transition', value: 65 },
+                ]}
+              />
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="p-7 rounded-2xl bg-secondary/60 border border-border">
+              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mb-5">
+                <BarChart3 className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-2">
+                Analyse vidéo &amp; Tracking
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Prise en charge des vidéos de match MP4 ainsi que des flux de coordonnées 25Hz et données d'événements.
               </p>
             </div>
+
+            <div className="p-7 rounded-2xl bg-secondary/60 border border-border">
+              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mb-5">
+                <Network className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-2">
+                Inférence GNN Explicable
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Localisation directe des surcharges numériques, espaces libres et joueurs clés adverses.
+              </p>
+            </div>
+
+            <div className="p-7 rounded-2xl bg-secondary/60 border border-border">
+              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center mb-5">
+                <Zap className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-2">
+                Décision en temps réel
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Interface fluide pensée pour la préparation d'avant-match et l'analyse vidéo à la mi-temps.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA — ReadMe-style rounded dark green callout banner */}
+      <section id="cta" className="relative border-b border-border">
+        <div className="mx-auto max-w-[1160px] border-x border-border px-6 sm:px-12 py-20">
+          <div className="rounded-[32px] bg-[#0B3D2E] text-white p-10 sm:p-16 text-center relative overflow-hidden shadow-xl">
+            <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+              <span className="inline-block rounded-full bg-[#072A20] border border-emerald-400/30 px-3.5 py-1 font-mono text-xs text-[#6EE7B7] uppercase tracking-wider">
+                Prêt pour le terrain
+              </span>
+              <h2 className="font-heading text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Transformez votre approche tactique dès aujourd'hui
+              </h2>
+              <p className="text-base sm:text-lg text-emerald-100/80">
+                Accédez au tableau de bord analytique, importez vos séquences vidéo et explorez les modèles tactiques d'Atlas.
+              </p>
+              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button
+                  onClick={() => navigate('/register')}
+                  className="inline-flex items-center gap-2 rounded-full bg-white text-[#0B3D2E] px-7 py-3.5 text-sm font-bold hover:bg-emerald-50 transition-colors shadow-md"
+                >
+                  <span>Créer un compte</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-[#072A20]/60 text-white px-7 py-3.5 text-sm font-semibold hover:border-emerald-300/60 transition-colors"
+                >
+                  <span>Se connecter</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-background">
+        <div className="mx-auto max-w-[1160px] border-x border-border px-6 sm:px-12 py-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+              <span className="w-2 h-2 rounded-full bg-[#6EE7B7]" />
+            </div>
+            <span className="font-heading font-bold text-foreground">Atlas</span>
+            <span>— Plateforme d'intelligence tactique du football</span>
+          </div>
+          <div className="font-mono text-xs text-muted-foreground">
+            RNSport · Barça Innovation Hub · Microsoft Inside the Game
           </div>
         </div>
       </footer>

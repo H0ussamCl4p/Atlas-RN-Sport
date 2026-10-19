@@ -59,10 +59,10 @@ export function NodeGraph({
   return (
     <div className={`relative w-full aspect-square rounded-lg overflow-hidden border border-border/50 ${className}`}>
       {/* Background */}
-      <div className="absolute inset-0 bg-card/50" />
+      <div className="absolute inset-0 bg-[#F6F9F7]" />
       
       {/* Grid pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808006_1px,transparent_1px),linear-gradient(to_bottom,#80808006_1px,transparent_1px)] bg-[size:30px_30px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0B3D2E0D_1px,transparent_1px),linear-gradient(to_bottom,#0B3D2E0D_1px,transparent_1px)] bg-[size:28px_28px]" />
 
       <svg
         viewBox="0 0 100 100"

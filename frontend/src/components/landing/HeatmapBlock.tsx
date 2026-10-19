@@ -39,11 +39,11 @@ export function HeatmapBlock({
       variants={!prefersReducedMotion ? heatmapVariants : undefined}
     >
       {/* Background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px]" />
+      <div className="absolute inset-0 bg-[#F6F9F7] bg-[linear-gradient(to_right,#0B3D2E0D_1px,transparent_1px),linear-gradient(to_bottom,#0B3D2E0D_1px,transparent_1px)] bg-[size:32px_32px]" />
       
       {/* Pitch outline subtle */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[90%] h-[85%] border border-primary/5 rounded-sm" />
+        <div className="w-[90%] h-[85%] border border-primary/20 rounded-sm" />
       </div>
 
       {/* Heatmap zones */}

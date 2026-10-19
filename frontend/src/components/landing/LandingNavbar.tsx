@@ -1,23 +1,7 @@
-/**
- * Landing Navbar
- * 
- * Minimal, editorial navigation for the landing page.
- * Publication-like aesthetic - calm, institutional, trustworthy.
- * 
- * DESIGN PHILOSOPHY:
- * - Transparent by default, subtle background on scroll
- * - Typography-first, no logo images
- * - Smooth scroll to sections
- * - Mobile: clean stacked menu
- * - Authority > marketing
- */
-
-import { motion, useScroll } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { prefersReducedMotion } from '@/animations/analyticalVariants';
 
 interface NavItem {
   label: string;
@@ -26,26 +10,20 @@ interface NavItem {
   type: 'scroll' | 'route';
 }
 
-const navItems: NavItem[] = [
+const leftNavItems: NavItem[] = [
   { label: 'Produit', sectionId: 'features', type: 'scroll' },
   { label: 'Méthodologie', sectionId: 'methodology', type: 'scroll' },
-  { label: 'Connexion', href: '/login', type: 'route' },
+];
+
+const rightNavItems: NavItem[] = [
+  { label: 'Métriques', sectionId: 'metrics', type: 'scroll' },
+  { label: 'Plateforme', sectionId: 'cta', type: 'scroll' },
 ];
 
 export function LandingNavbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { scrollY } = useScroll();
   const navigate = useNavigate();
 
-  // Detect scroll for background fade-in
-  useEffect(() => {
-    return scrollY.on('change', (latest) => {
-      setIsScrolled(latest > 100);
-    });
-  }, [scrollY]);
-
-  // Smooth scroll to section
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -54,7 +32,6 @@ export function LandingNavbar() {
     }
   };
 
-  // Handle navigation
   const handleNavClick = (item: NavItem) => {
     if (item.type === 'scroll' && item.sectionId) {
       scrollToSection(item.sectionId);
@@ -65,170 +42,110 @@ export function LandingNavbar() {
   };
 
   return (
-    <>
-      <motion.nav
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-          'border-b border-border/0',
-          isScrolled && 'border-border/50 bg-background/80 backdrop-blur-md'
-        )}
-        {...(!prefersReducedMotion && {
-          initial: { y: -100, opacity: 0 },
-          animate: { y: 0, opacity: 1 },
-          transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1] },
-        })}
-      >
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Wordmark */}
-            <Link
-              to="/"
-              className="text-xl md:text-2xl font-bold text-foreground tracking-tight hover:text-primary transition-colors"
-            >
+    <header className="relative z-50 bg-background">
+      <div className="mx-auto max-w-[1160px] border-x border-border px-4 sm:px-8 py-5">
+        <div className="relative flex items-center justify-between">
+          {/* Desktop Centered 3-part Nav inspired by ReadMe.com */}
+          <div className="hidden md:flex flex-1 items-center justify-end gap-1 pr-8">
+            {leftNavItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavClick(item)}
+                className="inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <span>{item.label}</span>
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            ))}
+          </div>
+
+          {/* Center Brand Mark */}
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 text-foreground hover:opacity-90 transition-opacity"
+          >
+            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shadow-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="8" stroke="white" strokeWidth="2.2" />
+                <circle cx="12" cy="12" r="2.5" fill="#6EE7B7" />
+              </svg>
+            </div>
+            <span className="font-heading font-extrabold text-lg tracking-tight text-foreground">
               Atlas
+            </span>
+          </Link>
+
+          <div className="hidden md:flex flex-1 items-center justify-start gap-1 pl-8">
+            {rightNavItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavClick(item)}
+                className="inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-medium text-foreground/80 hover:bg-secondary hover:text-foreground transition-colors"
+              >
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Right Auth Pill Buttons */}
+          <div className="hidden md:flex items-center gap-2 absolute right-0">
+            <Link
+              to="/login"
+              className="rounded-full px-4 py-1.5 text-sm font-medium text-foreground border border-border hover:bg-secondary transition-colors"
+            >
+              Connexion
             </Link>
+            <Link
+              to="/register"
+              className="rounded-full px-4 py-1.5 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
+            >
+              Commencer
+            </Link>
+          </div>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-8">
-              {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => handleNavClick(item)}
-                  className={cn(
-                    'text-sm font-medium text-muted-foreground',
-                    'hover:text-foreground transition-colors',
-                    'focus:outline-none focus:text-foreground',
-                    'relative group'
-                  )}
-                >
-                  {item.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-px bg-primary group-hover:w-full transition-all duration-300" />
-                </button>
-              ))}
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
+            aria-label="Menu"
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
 
-              {/* Primary CTA */}
+        {/* Mobile Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 pt-4 border-t border-border space-y-2">
+            {[...leftNavItems, ...rightNavItems].map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavClick(item)}
+                className="block w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-secondary"
+              >
+                {item.label}
+              </button>
+            ))}
+            <div className="pt-3 flex flex-col gap-2">
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-full border border-border text-sm font-medium text-foreground hover:bg-secondary"
+              >
+                Connexion
+              </Link>
               <Link
                 to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
-                  'px-6 py-2.5 text-sm font-medium',
-                  'text-primary-foreground bg-primary',
-                  'rounded-sm',
-                  'hover:bg-primary/90 transition-colors',
-                  'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background'
+                  'w-full text-center py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90'
                 )}
               >
-                Créer un compte
+                Commencer
               </Link>
             </div>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={cn(
-                'md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors',
-                'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded-sm'
-              )}
-              aria-label="Menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
           </div>
-        </div>
-      </motion.nav>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <motion.div
-          className="fixed inset-0 z-40 md:hidden"
-          {...(!prefersReducedMotion && {
-            initial: { opacity: 0 },
-            animate: { opacity: 1 },
-            exit: { opacity: 0 },
-            transition: { duration: 0.3 },
-          })}
-        >
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-background/95 backdrop-blur-md"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-
-          {/* Menu Content */}
-          <motion.div
-            className="relative h-full flex flex-col pt-24 px-4"
-            {...(!prefersReducedMotion && {
-              initial: { y: 20, opacity: 0 },
-              animate: { y: 0, opacity: 1 },
-              transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] },
-            })}
-          >
-            <nav className="space-y-1">
-              {navItems.map((item, index) => (
-                <motion.button
-                  key={item.label}
-                  onClick={() => handleNavClick(item)}
-                  className={cn(
-                    'w-full text-left px-4 py-4 text-lg font-medium',
-                    'text-foreground hover:bg-muted/50 transition-colors rounded-sm',
-                    'focus:outline-none focus:bg-muted/50',
-                    'border-b border-border/50 last:border-0'
-                  )}
-                  {...(!prefersReducedMotion && {
-                    initial: { x: -20, opacity: 0 },
-                    animate: { x: 0, opacity: 1 },
-                    transition: {
-                      duration: 0.4,
-                      delay: index * 0.1,
-                      ease: [0.25, 0.1, 0.25, 1],
-                    },
-                  })}
-                >
-                  {item.label}
-                </motion.button>
-              ))}
-
-              {/* Mobile CTA */}
-              <motion.div
-                className="pt-6"
-                {...(!prefersReducedMotion && {
-                  initial: { x: -20, opacity: 0 },
-                  animate: { x: 0, opacity: 1 },
-                  transition: {
-                    duration: 0.4,
-                    delay: navItems.length * 0.1,
-                    ease: [0.25, 0.1, 0.25, 1],
-                  },
-                })}
-              >
-                <Link
-                  to="/register"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={cn(
-                    'block w-full px-4 py-4 text-lg font-medium text-center',
-                    'text-primary-foreground bg-primary',
-                    'rounded-sm',
-                    'hover:bg-primary/90 transition-colors',
-                    'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background'
-                  )}
-                >
-                  Créer un compte
-                </Link>
-              </motion.div>
-            </nav>
-
-            {/* Footer note */}
-            <div className="mt-auto pb-8 pt-12 text-center">
-              <p className="text-sm text-muted-foreground">
-                L'intelligence tactique du football
-              </p>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </>
+        )}
+      </div>
+    </header>
   );
 }
