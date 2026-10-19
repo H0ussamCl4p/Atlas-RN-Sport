@@ -1,16 +1,5 @@
 # AI Service Integration Plan - Complete MVP
 
-## 🎯 Overview
-
-You have:
-
-- ✅ **Auth Service** (FastAPI) - User authentication & management
-- ✅ **Database Models** - Video, Analysis, Match models ready in `shared/models/ai.py`
-- ✅ **AI Code** - Video processing + GNN predictions + tactical analysis
-- ✅ **Frontend** (React) - Atlas-RN-Sport UI
-
-**Goal:** Create `ai_service` to process football videos and generate tactical analysis reports.
-
 ## 📁 Proposed Structure
 
 ```
